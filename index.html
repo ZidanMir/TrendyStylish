@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Trendy Stylishness</title>
+    <meta
+      name="description"
+      content="Trendy Stylishness sells card games, cute accessories, stationery, and giftable fancy items for teenagers in Bangladesh."
+    >
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Trendy Stylishness home">
+        <span class="brand-mark">TS</span>
+        <span>Trendy Stylishness</span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="#shop">Shop</a>
+        <a href="#bundles">Bundles</a>
+        <a href="#checkout">Checkout</a>
+      </nav>
+      <button class="cart-button" type="button" data-open-cart aria-label="Open cart">
+        <span class="cart-icon" aria-hidden="true">Bag</span>
+        <span id="cartCount">0</span>
+      </button>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <img class="hero-image" src="assets/hero-trendy-stylishness.png" alt="Colorful teen gift items and card game products">
+        <div class="hero-copy">
+          <p class="eyebrow">Teen gifts, party cards, desk cute-stuff</p>
+          <h1 id="hero-title">Trendy Stylishness</h1>
+          <p>
+            Small items with big personality: party card packs, phone charms, stickers, clips,
+            and fun gift boxes delivered across Bangladesh.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-link" href="#shop">Shop new drops</a>
+            <a class="secondary-link" href="#checkout">Pay with bKash</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="trust-strip" aria-label="Store highlights">
+        <div>
+          <strong>Cashless ready</strong>
+          <span>bKash API checkout placeholder</span>
+        </div>
+        <div>
+          <strong>Delivery ready</strong>
+          <span>Steadfast courier quote placeholder</span>
+        </div>
+        <div>
+          <strong>Teen focused</strong>
+          <span>Low-cost gifts and trend items</span>
+        </div>
+      </section>
+
+      <section class="section-shell" id="shop" aria-labelledby="shop-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Fresh shelf</p>
+            <h2 id="shop-title">Pick what matches your mood</h2>
+          </div>
+          <div class="filter-bar" aria-label="Product filters">
+            <button class="filter-pill active" type="button" data-filter="all">All</button>
+            <button class="filter-pill" type="button" data-filter="cards">Cards</button>
+            <button class="filter-pill" type="button" data-filter="accessories">Accessories</button>
+            <button class="filter-pill" type="button" data-filter="stationery">Stationery</button>
+          </div>
+        </div>
+
+        <div class="product-grid" id="productGrid"></div>
+      </section>
+
+      <section class="bundle-band" id="bundles" aria-labelledby="bundle-title">
+        <div class="bundle-copy">
+          <p class="eyebrow">Build a mini haul</p>
+          <h2 id="bundle-title">Make tiny gift sets fast</h2>
+          <p>
+            Bundle cards, charms, stickers, and stationery into one package. Perfect for birthdays,
+            school friend gifts, and weekend hangouts.
+          </p>
+        </div>
+        <div class="bundle-panel" aria-label="Bundle deal">
+          <span class="deal-tag">Starter bundle</span>
+          <strong>Any 3 small items</strong>
+          <p>Auto-estimated delivery and bKash checkout can be connected through two small backend routes.</p>
+          <button class="primary-button" type="button" data-bundle>Add bundle to cart</button>
+        </div>
+      </section>
+
+      <section class="checkout-preview" id="checkout" aria-labelledby="checkout-title">
+        <div class="checkout-copy">
+          <p class="eyebrow">Payment and delivery</p>
+          <h2 id="checkout-title">Light backend, real checkout path</h2>
+          <p>
+            The frontend is ready for API calls. In production, your server should create the bKash
+            payment and Steadfast consignment so secret keys never sit in browser code.
+          </p>
+        </div>
+        <form class="checkout-form" id="checkoutForm">
+          <label>
+            Customer name
+            <input name="name" type="text" placeholder="Example: Afia Rahman" required>
+          </label>
+          <label>
+            Phone number
+            <input name="phone" type="tel" placeholder="01XXXXXXXXX" required>
+          </label>
+          <label>
+            Delivery area
+            <select name="area" id="deliveryArea">
+              <option value="inside">Inside Dhaka</option>
+              <option value="outside">Outside Dhaka</option>
+            </select>
+          </label>
+          <label>
+            Address
+            <textarea name="address" rows="3" placeholder="House, road, area, district" required></textarea>
+          </label>
+          <div class="checkout-summary">
+            <span>Estimated delivery</span>
+            <strong id="deliveryFee">Tk 70</strong>
+          </div>
+          <button class="bkash-button" type="submit">Continue with bKash</button>
+          <p class="form-note" id="checkoutMessage" role="status"></p>
+        </form>
+      </section>
+    </main>
+
+    <aside class="cart-drawer" id="cartDrawer" aria-label="Shopping cart" aria-hidden="true">
+      <div class="cart-overlay" data-close-cart></div>
+      <div class="cart-panel">
+        <div class="cart-header">
+          <h2>Your cart</h2>
+          <button type="button" class="icon-button" data-close-cart aria-label="Close cart">X</button>
+        </div>
+        <div class="cart-items" id="cartItems"></div>
+        <div class="cart-total">
+          <span>Total</span>
+          <strong id="cartTotal">Tk 0</strong>
+        </div>
+        <a class="primary-link full" href="#checkout" data-close-cart>Checkout</a>
+      </div>
+    </aside>
+
+    <footer class="site-footer">
+      <strong>Trendy Stylishness</strong>
+      <span>Small item shop concept for teens. Built as a frontend-first storefront.</span>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

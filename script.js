@@ -42,7 +42,9 @@ const cartTotal = document.querySelector("#cartTotal");
 const deliveryArea = document.querySelector("#deliveryArea");
 const deliveryFee = document.querySelector("#deliveryFee");
 const checkoutForm = document.querySelector("#checkoutForm");
+const checkoutButton = document.querySelector("#checkoutButton");
 const checkoutMessage = document.querySelector("#checkoutMessage");
+const paymentMethods = document.querySelectorAll("input[name='paymentMethod']");
 
 function formatTk(value) {
   return `Tk ${value.toLocaleString("en-BD")}`;
@@ -165,17 +167,35 @@ deliveryArea.addEventListener("change", () => {
   deliveryFee.textContent = deliveryArea.value === "inside" ? "Tk 70" : "Tk 130";
 });
 
+function getPaymentMethod() {
+  return document.querySelector("input[name='paymentMethod']:checked")?.value || "bkash";
+}
+
+function updatePaymentMethod() {
+  const isCod = getPaymentMethod() === "cod";
+  checkoutButton.textContent = isCod ? "Place cash on delivery order" : "Continue with bKash";
+  checkoutButton.classList.toggle("cod-mode", isCod);
+}
+
+paymentMethods.forEach((method) => {
+  method.addEventListener("change", updatePaymentMethod);
+});
+
 checkoutForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const subtotal = getCartRows().reduce((sum, item) => sum + item.price * item.quantity, 0);
   const delivery = deliveryArea.value === "inside" ? 70 : 130;
   const payable = subtotal + delivery;
+  const paymentMethod = getPaymentMethod();
 
   checkoutMessage.textContent =
     payable > delivery
-      ? `Demo only: next step would call /api/bkash/create-payment for ${formatTk(payable)} and /api/steadfast/order after payment success.`
-      : "Add items to cart before starting bKash checkout.";
+      ? paymentMethod === "cod"
+        ? `Demo only: next step would call /api/steadfast/order as cash on delivery for ${formatTk(payable)}.`
+        : `Demo only: next step would call /api/bkash/create-payment for ${formatTk(payable)} and /api/steadfast/order after payment success.`
+      : "Add items to cart before starting checkout.";
 });
 
 renderProducts();
 updateCart();
+updatePaymentMethod();

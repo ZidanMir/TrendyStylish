@@ -478,6 +478,62 @@ h2 {
   box-shadow: 9px 9px 0 var(--ink);
 }
 
+.payment-method {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.payment-method legend {
+  grid-column: 1 / -1;
+  margin-bottom: 2px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 900;
+}
+
+.payment-option {
+  position: relative;
+  display: flex;
+  min-height: 78px;
+  padding: 14px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  background: #fffdfa;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.payment-option:has(input:checked) {
+  background: linear-gradient(135deg, #fff5cf, #e7fbff);
+  box-shadow: 5px 5px 0 var(--ink);
+}
+
+.payment-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.payment-option span,
+.payment-option strong,
+.payment-option small {
+  display: block;
+}
+
+.payment-option strong {
+  margin-bottom: 4px;
+}
+
+.payment-option small {
+  color: var(--muted);
+  font-weight: 800;
+}
+
 label {
   display: grid;
   gap: 7px;
@@ -521,6 +577,11 @@ textarea:focus {
   width: 100%;
   background: linear-gradient(135deg, #e2136e, #ff6aa6);
   color: white;
+}
+
+.bkash-button.cod-mode {
+  background: linear-gradient(135deg, var(--lemon), var(--orange));
+  color: var(--ink);
 }
 
 .form-note {
@@ -710,6 +771,10 @@ textarea:focus {
   .primary-button,
   .bkash-button {
     width: 100%;
+  }
+
+  .payment-method {
+    grid-template-columns: 1fr;
   }
 
   .product-grid {

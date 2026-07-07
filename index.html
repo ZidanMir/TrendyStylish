@@ -50,17 +50,17 @@
             A bright little universe of party card packs, phone charms, stickers, clips,
             and gift boxes that make every cart feel like a celebration.
           </p>
-          <div class="hero-actions">
-            <a class="primary-link" href="#shop">Shop new drops</a>
-            <a class="secondary-link" href="#checkout">Pay with bKash</a>
+        <div class="hero-actions">
+          <a class="primary-link" href="#shop">Shop new drops</a>
+            <a class="secondary-link" href="#checkout">bKash or COD</a>
           </div>
         </div>
       </section>
 
       <section class="trust-strip" aria-label="Store highlights">
         <div>
-          <strong>Cashless ready</strong>
-          <span>bKash API checkout placeholder</span>
+          <strong>Payment choice</strong>
+          <span>bKash online or cash on delivery</span>
         </div>
         <div>
           <strong>Delivery ready</strong>
@@ -101,7 +101,7 @@
         <div class="bundle-panel" aria-label="Bundle deal">
           <span class="deal-tag">Honor-roll bundle</span>
           <strong>Any 3 small items</strong>
-          <p>Auto-estimated delivery and bKash checkout can be connected through two small backend routes.</p>
+          <p>Auto-estimated delivery can pair with bKash online payment or a cash-on-delivery order.</p>
           <button class="primary-button" type="button" data-bundle>Add bundle to cart</button>
         </div>
       </section>
@@ -111,11 +111,28 @@
           <p class="eyebrow">Payment and delivery</p>
           <h2 id="checkout-title">Light backend, real checkout path</h2>
           <p>
-            The frontend is ready for API calls. In production, your server should create the bKash
-            payment and Steadfast consignment so secret keys never sit in browser code.
+            The frontend is ready for API calls. In production, your server can create bKash
+            payments or cash-on-delivery orders, then send the consignment to Steadfast.
           </p>
         </div>
         <form class="checkout-form" id="checkoutForm">
+          <fieldset class="payment-method">
+            <legend>Payment method</legend>
+            <label class="payment-option">
+              <input type="radio" name="paymentMethod" value="bkash" checked>
+              <span>
+                <strong>bKash</strong>
+                <small>Pay online before delivery</small>
+              </span>
+            </label>
+            <label class="payment-option">
+              <input type="radio" name="paymentMethod" value="cod">
+              <span>
+                <strong>Cash on delivery</strong>
+                <small>Pay when the parcel arrives</small>
+              </span>
+            </label>
+          </fieldset>
           <label>
             Customer name
             <input name="name" type="text" placeholder="Example: Afia Rahman" required>
@@ -139,7 +156,7 @@
             <span>Estimated delivery</span>
             <strong id="deliveryFee">Tk 70</strong>
           </div>
-          <button class="bkash-button" type="submit">Continue with bKash</button>
+          <button class="bkash-button" id="checkoutButton" type="submit">Continue with bKash</button>
           <p class="form-note" id="checkoutMessage" role="status"></p>
         </form>
       </section>

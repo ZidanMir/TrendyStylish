@@ -8,6 +8,7 @@
       name="description"
       content="Trendy Stylishness sells card games, cute accessories, stationery, and giftable fancy items for teenagers in Bangladesh."
     >
+    <link rel="preload" as="image" href="assets/graduation-inspired-hero.jpg" fetchpriority="high">
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
@@ -29,7 +30,19 @@
 
     <main id="top">
       <section class="hero" aria-labelledby="hero-title">
-        <img class="hero-image" src="assets/graduation-inspired-hero.png" alt="Colorful fantasy sky with floating teen gift items">
+        <picture>
+          <source srcset="assets/graduation-inspired-hero.jpg" type="image/jpeg">
+          <img
+            class="hero-image"
+            src="assets/graduation-inspired-hero.png"
+            alt="Colorful fantasy sky with floating teen gift items"
+            width="1536"
+            height="1024"
+            loading="eager"
+            decoding="async"
+            fetchpriority="high"
+          >
+        </picture>
         <div class="hero-copy">
           <p class="eyebrow">Sky-high teen drops</p>
           <h1 id="hero-title">Trendy Stylishness</h1>

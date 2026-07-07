@@ -1,7 +1,7 @@
 :root {
   --ink: #0b0b10;
-  --muted: #5c6070;
-  --paper: #f5f1e8;
+  --muted: #9ca0ad;
+  --paper: #101014;
   --line: #0b0b10;
   --coral: #d9142c;
   --teal: #b7ff2a;
@@ -10,8 +10,11 @@
   --violet: #6b6f7f;
   --orange: #ff4d00;
   --rose: #d9d6cc;
+  --cream: #f4f0e8;
+  --surface: #18181f;
+  --surface-soft: #22232c;
   --sky: #111827;
-  --shadow: 10px 10px 0 rgba(23, 20, 47, 0.95);
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
 }
 
 * {
@@ -25,10 +28,10 @@ html {
 body {
   margin: 0;
   background:
-    radial-gradient(circle at 8% 8%, rgba(216, 255, 47, 0.26), transparent 19rem),
-    radial-gradient(circle at 90% 22%, rgba(217, 20, 44, 0.2), transparent 21rem),
-    linear-gradient(180deg, #f5f1e8 0%, #ece8df 48%, #f7f4ed 100%);
-  color: var(--ink);
+    radial-gradient(circle at 8% 8%, rgba(216, 255, 47, 0.1), transparent 19rem),
+    radial-gradient(circle at 90% 22%, rgba(217, 20, 44, 0.12), transparent 21rem),
+    linear-gradient(180deg, #0e0e13 0%, #17171e 48%, #111116 100%);
+  color: var(--cream);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
@@ -58,9 +61,10 @@ button {
   gap: 16px;
   min-height: 72px;
   padding: 14px clamp(18px, 4vw, 54px);
-  background: rgba(255, 248, 239, 0.88);
-  border-bottom: 3px solid var(--line);
+  background: rgba(12, 12, 16, 0.82);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(18px);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.22);
 }
 
 .brand,
@@ -75,6 +79,7 @@ button {
 .brand {
   gap: 10px;
   font-weight: 900;
+  color: var(--cream);
 }
 
 .brand-mark {
@@ -82,32 +87,32 @@ button {
   place-items: center;
   width: 42px;
   height: 42px;
-  color: var(--ink);
+  color: var(--cream);
   background: conic-gradient(from 45deg, var(--teal), var(--coral), var(--ink), var(--blue), var(--teal));
-  border: 3px solid var(--ink);
+  border: 2px solid rgba(255, 255, 255, 0.8);
   border-radius: 50%;
-  box-shadow: 4px 4px 0 var(--ink);
+  box-shadow: 0 0 24px rgba(183, 255, 42, 0.22);
   font-size: 0.82rem;
 }
 
 .main-nav {
   gap: clamp(14px, 3vw, 34px);
-  color: var(--muted);
+  color: rgba(244, 240, 232, 0.72);
   font-weight: 750;
 }
 
 .main-nav a:hover {
-  color: var(--ink);
+  color: var(--cream);
 }
 
 .cart-button,
 .icon-button {
-  border: 3px solid var(--ink);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 999px;
-  background: linear-gradient(135deg, var(--ink), #38236e);
+  background: linear-gradient(135deg, #09090d, #20212a);
   color: white;
   font-weight: 850;
-  box-shadow: 4px 4px 0 var(--lemon);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.34);
 }
 
 .cart-button {
@@ -129,9 +134,9 @@ button {
   align-items: center;
   overflow: hidden;
   background:
-    radial-gradient(circle at 72% 16%, rgba(216, 255, 47, 0.2), transparent 12rem),
-    linear-gradient(135deg, #15151c 0%, #e9e4da 54%, #f5f1e8 100%);
-  border-bottom: 4px solid var(--line);
+    radial-gradient(circle at 72% 16%, rgba(216, 255, 47, 0.16), transparent 12rem),
+    linear-gradient(135deg, #08080c 0%, #141419 54%, #0d0d11 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .hero::after {
@@ -139,23 +144,13 @@ button {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 18% 48%, rgba(216, 255, 47, 0.22), transparent 11rem),
-    linear-gradient(90deg, rgba(245, 241, 232, 0.94) 0%, rgba(245, 241, 232, 0.7) 36%, rgba(245, 241, 232, 0.08) 100%),
-    linear-gradient(0deg, rgba(245, 241, 232, 0.95) 0%, rgba(245, 241, 232, 0) 23%);
+    radial-gradient(circle at 16% 42%, rgba(183, 255, 42, 0.16), transparent 12rem),
+    linear-gradient(90deg, rgba(8, 8, 12, 0.82) 0%, rgba(8, 8, 12, 0.56) 38%, rgba(8, 8, 12, 0.04) 100%),
+    linear-gradient(0deg, rgba(8, 8, 12, 0.72) 0%, rgba(8, 8, 12, 0) 25%);
 }
 
 .hero::before {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  right: clamp(18px, 7vw, 96px);
-  bottom: clamp(34px, 8vw, 92px);
-  width: clamp(90px, 15vw, 190px);
-  aspect-ratio: 1;
-  background: var(--teal);
-  clip-path: polygon(50% 0%, 59% 29%, 89% 13%, 74% 43%, 100% 50%, 74% 58%, 89% 87%, 59% 72%, 50% 100%, 41% 72%, 11% 87%, 26% 58%, 0% 50%, 26% 43%, 11% 13%, 41% 29%);
-  filter: drop-shadow(7px 7px 0 var(--ink));
-  opacity: 0.94;
+  content: none;
 }
 
 .hero-image {
@@ -172,6 +167,7 @@ button {
   width: min(680px, calc(100% - 36px));
   margin-left: clamp(18px, 6vw, 84px);
   padding-bottom: 38px;
+  color: var(--cream);
 }
 
 .eyebrow {
@@ -195,8 +191,8 @@ h1 {
   line-height: 0.9;
   letter-spacing: 0;
   text-shadow:
-    4px 4px 0 var(--coral),
-    8px 8px 0 rgba(20, 92, 255, 0.86);
+    0 2px 0 var(--coral),
+    0 18px 46px rgba(0, 0, 0, 0.62);
 }
 
 h2 {
@@ -210,7 +206,7 @@ h2 {
 .checkout-copy p,
 .bundle-copy p,
 .bundle-panel p {
-  color: #494b54;
+  color: rgba(244, 240, 232, 0.76);
   font-size: 1.04rem;
   line-height: 1.7;
 }
@@ -230,29 +226,29 @@ h2 {
   justify-content: center;
   min-height: 48px;
   border-radius: 999px;
-  border: 3px solid var(--ink);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   padding: 0 18px;
   font-weight: 900;
-  box-shadow: 5px 5px 0 var(--ink);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.32);
 }
 
 .primary-link,
 .primary-button {
-  background: linear-gradient(135deg, var(--ink), #2a2b35);
+  background: linear-gradient(135deg, #050507, #24252d);
   color: white;
 }
 
 .secondary-link {
-  background: linear-gradient(135deg, var(--teal), #ffffff);
+  background: linear-gradient(135deg, var(--teal), #eefdd8);
   color: var(--ink);
 }
 
 .trust-strip {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  background: var(--ink);
+  background: linear-gradient(90deg, #08080c, #15151d);
   color: white;
-  border-bottom: 4px solid var(--line);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
 }
 
 .trust-strip div {
@@ -295,20 +291,7 @@ h2 {
 }
 
 .section-shell::before {
-  content: "";
-  position: absolute;
-  top: 58px;
-  right: clamp(18px, 6vw, 82px);
-  width: 118px;
-  aspect-ratio: 1;
-  border: 4px solid var(--ink);
-  border-radius: 50%;
-  background:
-    linear-gradient(45deg, transparent 46%, var(--ink) 47%, var(--ink) 53%, transparent 54%),
-    linear-gradient(-45deg, transparent 46%, var(--ink) 47%, var(--ink) 53%, transparent 54%),
-    var(--coral);
-  opacity: 0.9;
-  transform: rotate(-12deg);
+  content: none;
 }
 
 .filter-bar {
@@ -318,19 +301,19 @@ h2 {
 
 .filter-pill {
   min-height: 40px;
-  border: 3px solid var(--ink);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 999px;
   padding: 0 16px;
-  background: white;
-  color: var(--ink);
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(244, 240, 232, 0.78);
   font-weight: 850;
-  box-shadow: 3px 3px 0 var(--ink);
+  box-shadow: none;
 }
 
 .filter-pill.active {
-  background: var(--lemon);
+  background: var(--teal);
   color: var(--ink);
-  border-color: var(--ink);
+  border-color: transparent;
 }
 
 .product-grid {
@@ -344,21 +327,22 @@ h2 {
   grid-template-rows: auto 1fr;
   overflow: hidden;
   min-height: 100%;
-  background: #ffffff;
-  border: 4px solid var(--ink);
-  border-radius: 18px;
-  box-shadow: 8px 8px 0 var(--ink);
-  transform: rotate(-0.5deg);
-  transition: transform 160ms ease, box-shadow 160ms ease;
+  background: linear-gradient(180deg, #202128, #15161d);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  transform: none;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
 }
 
 .product-card:nth-child(even) {
-  transform: rotate(0.7deg);
+  transform: none;
 }
 
 .product-card:hover {
-  transform: translate(-3px, -3px) rotate(0deg);
-  box-shadow: 12px 12px 0 var(--coral);
+  transform: translateY(-4px);
+  border-color: rgba(183, 255, 42, 0.46);
+  box-shadow: 0 26px 74px rgba(0, 0, 0, 0.44);
 }
 
 .product-card img {
@@ -373,13 +357,14 @@ h2 {
   gap: 12px;
   padding: 18px;
   background:
-    linear-gradient(90deg, rgba(255, 225, 77, 0.32), transparent),
-    white;
+    linear-gradient(90deg, rgba(183, 255, 42, 0.08), transparent),
+    #171820;
 }
 
 .product-info h3 {
   margin: 0;
   font-size: 1.05rem;
+  color: var(--cream);
 }
 
 .product-meta {
@@ -393,20 +378,20 @@ h2 {
 .price {
   color: var(--ink);
   font-weight: 950;
-  background: var(--lemon);
-  border: 2px solid var(--ink);
+  background: var(--teal);
+  border: 0;
   border-radius: 999px;
   padding: 4px 8px;
 }
 
 .add-button {
   min-height: 42px;
-  border: 3px solid var(--ink);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 999px;
-  background: linear-gradient(135deg, var(--coral), var(--orange));
-  color: var(--ink);
+  background: linear-gradient(135deg, #0b0b10, #292a33);
+  color: white;
   font-weight: 950;
-  box-shadow: 4px 4px 0 var(--ink);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
 }
 
 .bundle-band {
@@ -416,16 +401,16 @@ h2 {
   align-items: center;
   padding: clamp(48px, 8vw, 100px) clamp(18px, 4vw, 54px);
   background:
-    radial-gradient(circle at 82% 24%, rgba(216, 255, 47, 0.46), transparent 11rem),
-    linear-gradient(135deg, #14141b 0%, #d9142c 52%, #145cff 100%);
-  border-block: 4px solid var(--line);
+    radial-gradient(circle at 82% 24%, rgba(216, 255, 47, 0.28), transparent 11rem),
+    linear-gradient(135deg, #08080c 0%, #251016 52%, #0d1a38 100%);
+  border-block: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .bundle-panel {
-  background: var(--ink);
+  background: rgba(12, 12, 16, 0.82);
   color: white;
-  border: 4px solid white;
-  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 18px;
   padding: clamp(22px, 4vw, 36px);
   box-shadow: var(--shadow);
 }
@@ -439,9 +424,9 @@ h2 {
   margin-bottom: 18px;
   padding: 7px 10px;
   border-radius: 999px;
-  background: var(--lemon);
+  background: var(--teal);
   color: var(--ink);
-  border: 3px solid var(--ink);
+  border: 0;
   font-size: 0.78rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -472,10 +457,10 @@ h2 {
   display: grid;
   gap: 14px;
   padding: clamp(18px, 4vw, 32px);
-  background: white;
-  border: 4px solid var(--ink);
-  border-radius: 22px;
-  box-shadow: 9px 9px 0 var(--ink);
+  background: linear-gradient(180deg, #202128, #15161d);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
 }
 
 .payment-method {
@@ -500,16 +485,17 @@ h2 {
   display: flex;
   min-height: 78px;
   padding: 14px;
-  border: 3px solid var(--ink);
-  border-radius: 16px;
-  background: #fffdfa;
-  color: var(--ink);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--cream);
   cursor: pointer;
 }
 
 .payment-option:has(input:checked) {
-  background: linear-gradient(135deg, #fff5cf, #e7fbff);
-  box-shadow: 5px 5px 0 var(--ink);
+  background: linear-gradient(135deg, rgba(183, 255, 42, 0.18), rgba(255, 255, 255, 0.08));
+  border-color: rgba(183, 255, 42, 0.54);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.28);
 }
 
 .payment-option input {
@@ -546,10 +532,10 @@ input,
 select,
 textarea {
   width: 100%;
-  border: 3px solid var(--ink);
-  border-radius: 14px;
-  background: #fffdfa;
-  color: var(--ink);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--cream);
   padding: 13px 12px;
   outline: none;
 }
@@ -568,9 +554,9 @@ textarea:focus {
   justify-content: space-between;
   gap: 14px;
   padding: 14px;
-  background: #fff5cf;
-  border: 3px solid var(--ink);
-  border-radius: 16px;
+  background: rgba(183, 255, 42, 0.12);
+  border: 1px solid rgba(183, 255, 42, 0.34);
+  border-radius: 14px;
 }
 
 .bkash-button {
@@ -619,10 +605,10 @@ textarea:focus {
   height: 100%;
   padding: 22px;
   background:
-    radial-gradient(circle at 20% 10%, rgba(255, 225, 77, 0.58), transparent 11rem),
-    var(--paper);
+    radial-gradient(circle at 20% 10%, rgba(183, 255, 42, 0.14), transparent 11rem),
+    #111117;
   box-shadow: var(--shadow);
-  border-left: 4px solid var(--ink);
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .cart-header {
@@ -654,9 +640,9 @@ textarea:focus {
   gap: 12px;
   align-items: center;
   padding: 10px;
-  background: white;
-  border: 3px solid var(--ink);
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
 }
 
 .cart-item img {
@@ -695,11 +681,11 @@ textarea:focus {
   gap: 18px;
   padding: 30px clamp(18px, 4vw, 54px);
   color: var(--muted);
-  border-top: 4px solid var(--line);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .site-footer strong {
-  color: var(--ink);
+  color: var(--cream);
 }
 
 @media (max-width: 920px) {
@@ -749,7 +735,7 @@ textarea:focus {
 
   .hero::after {
   background:
-      linear-gradient(0deg, rgba(245, 241, 232, 0.98) 0%, rgba(245, 241, 232, 0.78) 48%, rgba(245, 241, 232, 0.18) 100%);
+      linear-gradient(0deg, rgba(8, 8, 12, 0.92) 0%, rgba(8, 8, 12, 0.68) 48%, rgba(8, 8, 12, 0.16) 100%);
   }
 
   .hero::before,

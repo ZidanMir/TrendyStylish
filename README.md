@@ -3,9 +3,9 @@
 A frontend-first ecommerce concept for small teen-focused items such as party cards,
 phone charms, fancy accessories, stickers, stationery, and gift bundles.
 
-The current visual direction uses an original gender-neutral streetwear look:
-dark hero artwork, floating shop items, bold outlined controls, and high-contrast
-red, black, chrome, blue, and acid-green accents.
+The current visual direction blends a colorful graduation-pop hero with premium
+streetwear styling: floating shop items, dark accent panels, polished controls,
+and red, blue, chrome, cream, and acid-green accents.
 
 ## Files
 

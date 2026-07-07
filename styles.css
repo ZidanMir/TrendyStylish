@@ -1,20 +1,20 @@
 :root {
   --ink: #0b0b10;
-  --muted: #9ca0ad;
-  --paper: #101014;
+  --muted: #655f76;
+  --paper: #f7f1e7;
   --line: #0b0b10;
   --coral: #d9142c;
   --teal: #b7ff2a;
   --lemon: #d8ff2f;
   --blue: #145cff;
-  --violet: #6b6f7f;
+  --violet: #6937b8;
   --orange: #ff4d00;
   --rose: #d9d6cc;
   --cream: #f4f0e8;
-  --surface: #18181f;
-  --surface-soft: #22232c;
+  --surface: #fffaf2;
+  --surface-soft: #ede6da;
   --sky: #111827;
-  --shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+  --shadow: 0 24px 70px rgba(20, 15, 35, 0.18);
 }
 
 * {
@@ -28,10 +28,10 @@ html {
 body {
   margin: 0;
   background:
-    radial-gradient(circle at 8% 8%, rgba(216, 255, 47, 0.1), transparent 19rem),
-    radial-gradient(circle at 90% 22%, rgba(217, 20, 44, 0.12), transparent 21rem),
-    linear-gradient(180deg, #0e0e13 0%, #17171e 48%, #111116 100%);
-  color: var(--cream);
+    radial-gradient(circle at 8% 8%, rgba(216, 255, 47, 0.18), transparent 19rem),
+    radial-gradient(circle at 90% 22%, rgba(105, 55, 184, 0.16), transparent 21rem),
+    linear-gradient(180deg, #f7f1e7 0%, #efe7db 48%, #f9f5ee 100%);
+  color: var(--ink);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
@@ -61,10 +61,10 @@ button {
   gap: 16px;
   min-height: 72px;
   padding: 14px clamp(18px, 4vw, 54px);
-  background: rgba(12, 12, 16, 0.82);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(247, 241, 231, 0.86);
+  border-bottom: 1px solid rgba(11, 11, 16, 0.14);
   backdrop-filter: blur(18px);
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 14px 36px rgba(20, 15, 35, 0.1);
 }
 
 .brand,
@@ -79,7 +79,7 @@ button {
 .brand {
   gap: 10px;
   font-weight: 900;
-  color: var(--cream);
+  color: var(--ink);
 }
 
 .brand-mark {
@@ -87,22 +87,22 @@ button {
   place-items: center;
   width: 42px;
   height: 42px;
-  color: var(--cream);
+  color: var(--ink);
   background: conic-gradient(from 45deg, var(--teal), var(--coral), var(--ink), var(--blue), var(--teal));
   border: 2px solid rgba(255, 255, 255, 0.8);
   border-radius: 50%;
-  box-shadow: 0 0 24px rgba(183, 255, 42, 0.22);
+  box-shadow: 0 0 24px rgba(105, 55, 184, 0.18);
   font-size: 0.82rem;
 }
 
 .main-nav {
   gap: clamp(14px, 3vw, 34px);
-  color: rgba(244, 240, 232, 0.72);
+  color: var(--muted);
   font-weight: 750;
 }
 
 .main-nav a:hover {
-  color: var(--cream);
+  color: var(--ink);
 }
 
 .cart-button,
@@ -134,9 +134,9 @@ button {
   align-items: center;
   overflow: hidden;
   background:
-    radial-gradient(circle at 72% 16%, rgba(216, 255, 47, 0.16), transparent 12rem),
-    linear-gradient(135deg, #08080c 0%, #141419 54%, #0d0d11 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    radial-gradient(circle at 72% 16%, rgba(216, 255, 47, 0.2), transparent 12rem),
+    linear-gradient(135deg, #c5ebff 0%, #fbf0d9 54%, #f4eaf9 100%);
+  border-bottom: 1px solid rgba(11, 11, 16, 0.16);
 }
 
 .hero::after {
@@ -144,9 +144,9 @@ button {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 16% 42%, rgba(183, 255, 42, 0.16), transparent 12rem),
-    linear-gradient(90deg, rgba(8, 8, 12, 0.82) 0%, rgba(8, 8, 12, 0.56) 38%, rgba(8, 8, 12, 0.04) 100%),
-    linear-gradient(0deg, rgba(8, 8, 12, 0.72) 0%, rgba(8, 8, 12, 0) 25%);
+    radial-gradient(circle at 17% 45%, rgba(216, 255, 47, 0.26), transparent 12rem),
+    linear-gradient(90deg, rgba(247, 241, 231, 0.84) 0%, rgba(247, 241, 231, 0.56) 34%, rgba(247, 241, 231, 0.08) 100%),
+    linear-gradient(0deg, rgba(11, 11, 16, 0.34) 0%, rgba(11, 11, 16, 0) 26%);
 }
 
 .hero::before {
@@ -167,7 +167,7 @@ button {
   width: min(680px, calc(100% - 36px));
   margin-left: clamp(18px, 6vw, 84px);
   padding-bottom: 38px;
-  color: var(--cream);
+  color: var(--ink);
 }
 
 .eyebrow {
@@ -191,8 +191,9 @@ h1 {
   line-height: 0.9;
   letter-spacing: 0;
   text-shadow:
-    0 2px 0 var(--coral),
-    0 18px 46px rgba(0, 0, 0, 0.62);
+    4px 4px 0 var(--coral),
+    8px 8px 0 rgba(20, 92, 255, 0.76),
+    0 20px 50px rgba(20, 15, 35, 0.24);
 }
 
 h2 {
@@ -206,7 +207,7 @@ h2 {
 .checkout-copy p,
 .bundle-copy p,
 .bundle-panel p {
-  color: rgba(244, 240, 232, 0.76);
+  color: #514b60;
   font-size: 1.04rem;
   line-height: 1.7;
 }
@@ -327,8 +328,8 @@ h2 {
   grid-template-rows: auto 1fr;
   overflow: hidden;
   min-height: 100%;
-  background: linear-gradient(180deg, #202128, #15161d);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, #fffaf2, #efe7db);
+  border: 1px solid rgba(11, 11, 16, 0.12);
   border-radius: 14px;
   box-shadow: var(--shadow);
   transform: none;
@@ -341,8 +342,8 @@ h2 {
 
 .product-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(183, 255, 42, 0.46);
-  box-shadow: 0 26px 74px rgba(0, 0, 0, 0.44);
+  border-color: rgba(105, 55, 184, 0.24);
+  box-shadow: 0 26px 74px rgba(20, 15, 35, 0.22);
 }
 
 .product-card img {
@@ -357,14 +358,14 @@ h2 {
   gap: 12px;
   padding: 18px;
   background:
-    linear-gradient(90deg, rgba(183, 255, 42, 0.08), transparent),
-    #171820;
+    linear-gradient(90deg, rgba(183, 255, 42, 0.12), transparent),
+    #fffaf2;
 }
 
 .product-info h3 {
   margin: 0;
   font-size: 1.05rem;
-  color: var(--cream);
+  color: var(--ink);
 }
 
 .product-meta {
@@ -404,6 +405,15 @@ h2 {
     radial-gradient(circle at 82% 24%, rgba(216, 255, 47, 0.28), transparent 11rem),
     linear-gradient(135deg, #08080c 0%, #251016 52%, #0d1a38 100%);
   border-block: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--cream);
+}
+
+.bundle-band .eyebrow {
+  color: var(--teal);
+}
+
+.bundle-band .bundle-copy p {
+  color: rgba(244, 240, 232, 0.78);
 }
 
 .bundle-panel {
@@ -457,8 +467,8 @@ h2 {
   display: grid;
   gap: 14px;
   padding: clamp(18px, 4vw, 32px);
-  background: linear-gradient(180deg, #202128, #15161d);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, #fffaf2, #efe7db);
+  border: 1px solid rgba(11, 11, 16, 0.12);
   border-radius: 18px;
   box-shadow: var(--shadow);
 }
@@ -485,10 +495,10 @@ h2 {
   display: flex;
   min-height: 78px;
   padding: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(11, 11, 16, 0.12);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--cream);
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--ink);
   cursor: pointer;
 }
 
@@ -532,10 +542,10 @@ input,
 select,
 textarea {
   width: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(11, 11, 16, 0.16);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--cream);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--ink);
   padding: 13px 12px;
   outline: none;
 }
@@ -609,6 +619,7 @@ textarea:focus {
     #111117;
   box-shadow: var(--shadow);
   border-left: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--cream);
 }
 
 .cart-header {
@@ -657,6 +668,10 @@ textarea:focus {
   display: block;
 }
 
+.cart-item strong {
+  color: var(--cream);
+}
+
 .cart-item span {
   color: var(--muted);
   font-size: 0.9rem;
@@ -685,7 +700,7 @@ textarea:focus {
 }
 
 .site-footer strong {
-  color: var(--cream);
+  color: var(--ink);
 }
 
 @media (max-width: 920px) {
@@ -735,7 +750,7 @@ textarea:focus {
 
   .hero::after {
   background:
-      linear-gradient(0deg, rgba(8, 8, 12, 0.92) 0%, rgba(8, 8, 12, 0.68) 48%, rgba(8, 8, 12, 0.16) 100%);
+      linear-gradient(0deg, rgba(247, 241, 231, 0.92) 0%, rgba(247, 241, 231, 0.7) 48%, rgba(247, 241, 231, 0.16) 100%);
   }
 
   .hero::before,

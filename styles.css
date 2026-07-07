@@ -1,16 +1,16 @@
 :root {
-  --ink: #17142f;
-  --muted: #655f7c;
-  --paper: #fff8ef;
-  --line: #2b2457;
-  --coral: #ff4f8b;
-  --teal: #00c6c8;
-  --lemon: #ffe14d;
-  --blue: #2769ff;
-  --violet: #8b4dff;
-  --orange: #ff8b22;
-  --rose: #ffd0ef;
-  --sky: #7fd7ff;
+  --ink: #0b0b10;
+  --muted: #5c6070;
+  --paper: #f5f1e8;
+  --line: #0b0b10;
+  --coral: #d9142c;
+  --teal: #b7ff2a;
+  --lemon: #d8ff2f;
+  --blue: #145cff;
+  --violet: #6b6f7f;
+  --orange: #ff4d00;
+  --rose: #d9d6cc;
+  --sky: #111827;
   --shadow: 10px 10px 0 rgba(23, 20, 47, 0.95);
 }
 
@@ -25,9 +25,9 @@ html {
 body {
   margin: 0;
   background:
-    radial-gradient(circle at 8% 8%, rgba(255, 225, 77, 0.5), transparent 19rem),
-    radial-gradient(circle at 90% 22%, rgba(0, 198, 200, 0.34), transparent 21rem),
-    linear-gradient(180deg, #fff8ef 0%, #f3f1ff 48%, #fff8ef 100%);
+    radial-gradient(circle at 8% 8%, rgba(216, 255, 47, 0.26), transparent 19rem),
+    radial-gradient(circle at 90% 22%, rgba(217, 20, 44, 0.2), transparent 21rem),
+    linear-gradient(180deg, #f5f1e8 0%, #ece8df 48%, #f7f4ed 100%);
   color: var(--ink);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -83,7 +83,7 @@ button {
   width: 42px;
   height: 42px;
   color: var(--ink);
-  background: conic-gradient(from 45deg, var(--lemon), var(--coral), var(--violet), var(--teal), var(--lemon));
+  background: conic-gradient(from 45deg, var(--teal), var(--coral), var(--ink), var(--blue), var(--teal));
   border: 3px solid var(--ink);
   border-radius: 50%;
   box-shadow: 4px 4px 0 var(--ink);
@@ -129,8 +129,8 @@ button {
   align-items: center;
   overflow: hidden;
   background:
-    radial-gradient(circle at 72% 16%, rgba(255, 225, 77, 0.48), transparent 12rem),
-    linear-gradient(135deg, #bbecff 0%, #fff7e8 54%, #fdf2ff 100%);
+    radial-gradient(circle at 72% 16%, rgba(216, 255, 47, 0.2), transparent 12rem),
+    linear-gradient(135deg, #15151c 0%, #e9e4da 54%, #f5f1e8 100%);
   border-bottom: 4px solid var(--line);
 }
 
@@ -139,9 +139,9 @@ button {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 19% 48%, rgba(255, 225, 77, 0.58), transparent 11rem),
-    linear-gradient(90deg, rgba(255, 248, 239, 0.92) 0%, rgba(255, 248, 239, 0.68) 38%, rgba(255, 248, 239, 0.04) 100%),
-    linear-gradient(0deg, rgba(255, 248, 239, 0.95) 0%, rgba(255, 248, 239, 0) 23%);
+    radial-gradient(circle at 18% 48%, rgba(216, 255, 47, 0.22), transparent 11rem),
+    linear-gradient(90deg, rgba(245, 241, 232, 0.94) 0%, rgba(245, 241, 232, 0.7) 36%, rgba(245, 241, 232, 0.08) 100%),
+    linear-gradient(0deg, rgba(245, 241, 232, 0.95) 0%, rgba(245, 241, 232, 0) 23%);
 }
 
 .hero::before {
@@ -152,7 +152,7 @@ button {
   bottom: clamp(34px, 8vw, 92px);
   width: clamp(90px, 15vw, 190px);
   aspect-ratio: 1;
-  background: var(--lemon);
+  background: var(--teal);
   clip-path: polygon(50% 0%, 59% 29%, 89% 13%, 74% 43%, 100% 50%, 74% 58%, 89% 87%, 59% 72%, 50% 100%, 41% 72%, 11% 87%, 26% 58%, 0% 50%, 26% 43%, 11% 13%, 41% 29%);
   filter: drop-shadow(7px 7px 0 var(--ink));
   opacity: 0.94;
@@ -195,8 +195,8 @@ h1 {
   line-height: 0.9;
   letter-spacing: 0;
   text-shadow:
-    4px 4px 0 var(--lemon),
-    8px 8px 0 rgba(255, 79, 139, 0.86);
+    4px 4px 0 var(--coral),
+    8px 8px 0 rgba(20, 92, 255, 0.86);
 }
 
 h2 {
@@ -238,12 +238,12 @@ h2 {
 
 .primary-link,
 .primary-button {
-  background: linear-gradient(135deg, var(--blue), var(--violet));
+  background: linear-gradient(135deg, var(--ink), #2a2b35);
   color: white;
 }
 
 .secondary-link {
-  background: linear-gradient(135deg, var(--lemon), #ffb02e);
+  background: linear-gradient(135deg, var(--teal), #ffffff);
   color: var(--ink);
 }
 
@@ -416,8 +416,8 @@ h2 {
   align-items: center;
   padding: clamp(48px, 8vw, 100px) clamp(18px, 4vw, 54px);
   background:
-    radial-gradient(circle at 82% 24%, rgba(255, 225, 77, 0.72), transparent 11rem),
-    linear-gradient(135deg, #70dcff 0%, #ffb4dc 52%, #ffe88a 100%);
+    radial-gradient(circle at 82% 24%, rgba(216, 255, 47, 0.46), transparent 11rem),
+    linear-gradient(135deg, #14141b 0%, #d9142c 52%, #145cff 100%);
   border-block: 4px solid var(--line);
 }
 
@@ -748,8 +748,8 @@ textarea:focus {
   }
 
   .hero::after {
-    background:
-      linear-gradient(0deg, rgba(255, 248, 239, 0.98) 0%, rgba(255, 248, 239, 0.78) 48%, rgba(255, 248, 239, 0.18) 100%);
+  background:
+      linear-gradient(0deg, rgba(245, 241, 232, 0.98) 0%, rgba(245, 241, 232, 0.78) 48%, rgba(245, 241, 232, 0.18) 100%);
   }
 
   .hero::before,

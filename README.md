@@ -3,6 +3,10 @@
 A frontend-first ecommerce concept for small teen-focused items such as party cards,
 phone charms, fancy accessories, stickers, stationery, and gift bundles.
 
+The current visual direction uses an original, colorful graduation-day fantasy look:
+bright sky, surreal floating shop items, bold outlined controls, and celebratory pop
+colors without copying any existing album artwork.
+
 ## Files
 
 - `index.html` - storefront markup

@@ -1,14 +1,17 @@
 :root {
-  --ink: #15151a;
-  --muted: #686a73;
-  --paper: #fffdf8;
-  --line: #e8e3d9;
-  --coral: #ff5f57;
-  --teal: #05a7a0;
-  --lemon: #ffd84d;
-  --blue: #2457ff;
-  --rose: #f8d9df;
-  --shadow: 0 22px 70px rgba(21, 21, 26, 0.14);
+  --ink: #17142f;
+  --muted: #655f7c;
+  --paper: #fff8ef;
+  --line: #2b2457;
+  --coral: #ff4f8b;
+  --teal: #00c6c8;
+  --lemon: #ffe14d;
+  --blue: #2769ff;
+  --violet: #8b4dff;
+  --orange: #ff8b22;
+  --rose: #ffd0ef;
+  --sky: #7fd7ff;
+  --shadow: 10px 10px 0 rgba(23, 20, 47, 0.95);
 }
 
 * {
@@ -21,7 +24,10 @@ html {
 
 body {
   margin: 0;
-  background: var(--paper);
+  background:
+    radial-gradient(circle at 8% 8%, rgba(255, 225, 77, 0.5), transparent 19rem),
+    radial-gradient(circle at 90% 22%, rgba(0, 198, 200, 0.34), transparent 21rem),
+    linear-gradient(180deg, #fff8ef 0%, #f3f1ff 48%, #fff8ef 100%);
   color: var(--ink);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -52,8 +58,8 @@ button {
   gap: 16px;
   min-height: 72px;
   padding: 14px clamp(18px, 4vw, 54px);
-  background: rgba(255, 253, 248, 0.88);
-  border-bottom: 1px solid rgba(232, 227, 217, 0.86);
+  background: rgba(255, 248, 239, 0.88);
+  border-bottom: 3px solid var(--line);
   backdrop-filter: blur(18px);
 }
 
@@ -76,11 +82,11 @@ button {
   place-items: center;
   width: 42px;
   height: 42px;
-  color: white;
-  background: var(--ink);
-  border: 3px solid var(--lemon);
-  border-radius: 8px;
-  box-shadow: 4px 4px 0 var(--coral);
+  color: var(--ink);
+  background: conic-gradient(from 45deg, var(--lemon), var(--coral), var(--violet), var(--teal), var(--lemon));
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  box-shadow: 4px 4px 0 var(--ink);
   font-size: 0.82rem;
 }
 
@@ -96,11 +102,12 @@ button {
 
 .cart-button,
 .icon-button {
-  border: 0;
-  border-radius: 8px;
-  background: var(--ink);
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--ink), #38236e);
   color: white;
   font-weight: 850;
+  box-shadow: 4px 4px 0 var(--lemon);
 }
 
 .cart-button {
@@ -121,7 +128,7 @@ button {
   display: grid;
   align-items: center;
   overflow: hidden;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 4px solid var(--line);
 }
 
 .hero::after {
@@ -129,8 +136,23 @@ button {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(255, 253, 248, 0.94) 0%, rgba(255, 253, 248, 0.72) 42%, rgba(255, 253, 248, 0.12) 100%),
-    linear-gradient(0deg, rgba(255, 253, 248, 0.96) 0%, rgba(255, 253, 248, 0) 22%);
+    radial-gradient(circle at 19% 48%, rgba(255, 225, 77, 0.58), transparent 11rem),
+    linear-gradient(90deg, rgba(255, 248, 239, 0.92) 0%, rgba(255, 248, 239, 0.68) 38%, rgba(255, 248, 239, 0.04) 100%),
+    linear-gradient(0deg, rgba(255, 248, 239, 0.95) 0%, rgba(255, 248, 239, 0) 23%);
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  right: clamp(18px, 7vw, 96px);
+  bottom: clamp(34px, 8vw, 92px);
+  width: clamp(90px, 15vw, 190px);
+  aspect-ratio: 1;
+  background: var(--lemon);
+  clip-path: polygon(50% 0%, 59% 29%, 89% 13%, 74% 43%, 100% 50%, 74% 58%, 89% 87%, 59% 72%, 50% 100%, 41% 72%, 11% 87%, 26% 58%, 0% 50%, 26% 43%, 11% 13%, 41% 29%);
+  filter: drop-shadow(7px 7px 0 var(--ink));
+  opacity: 0.94;
 }
 
 .hero-image {
@@ -169,6 +191,9 @@ h1 {
   font-size: clamp(3.4rem, 9vw, 7.2rem);
   line-height: 0.9;
   letter-spacing: 0;
+  text-shadow:
+    4px 4px 0 var(--lemon),
+    8px 8px 0 rgba(255, 79, 139, 0.86);
 }
 
 h2 {
@@ -201,33 +226,35 @@ h2 {
   align-items: center;
   justify-content: center;
   min-height: 48px;
-  border-radius: 8px;
-  border: 0;
+  border-radius: 999px;
+  border: 3px solid var(--ink);
   padding: 0 18px;
   font-weight: 900;
+  box-shadow: 5px 5px 0 var(--ink);
 }
 
 .primary-link,
 .primary-button {
-  background: var(--ink);
+  background: linear-gradient(135deg, var(--blue), var(--violet));
   color: white;
 }
 
 .secondary-link {
-  background: var(--lemon);
+  background: linear-gradient(135deg, var(--lemon), #ffb02e);
   color: var(--ink);
-  border: 2px solid var(--ink);
 }
 
 .trust-strip {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  border-bottom: 1px solid var(--line);
+  background: var(--ink);
+  color: white;
+  border-bottom: 4px solid var(--line);
 }
 
 .trust-strip div {
   padding: 24px clamp(18px, 4vw, 54px);
-  border-right: 1px solid var(--line);
+  border-right: 2px solid rgba(255, 255, 255, 0.18);
 }
 
 .trust-strip div:last-child {
@@ -244,7 +271,7 @@ h2 {
 }
 
 .trust-strip span {
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .section-shell,
@@ -260,6 +287,27 @@ h2 {
   margin-bottom: 26px;
 }
 
+.section-shell {
+  position: relative;
+}
+
+.section-shell::before {
+  content: "";
+  position: absolute;
+  top: 58px;
+  right: clamp(18px, 6vw, 82px);
+  width: 118px;
+  aspect-ratio: 1;
+  border: 4px solid var(--ink);
+  border-radius: 50%;
+  background:
+    linear-gradient(45deg, transparent 46%, var(--ink) 47%, var(--ink) 53%, transparent 54%),
+    linear-gradient(-45deg, transparent 46%, var(--ink) 47%, var(--ink) 53%, transparent 54%),
+    var(--coral);
+  opacity: 0.9;
+  transform: rotate(-12deg);
+}
+
 .filter-bar {
   flex-wrap: wrap;
   gap: 8px;
@@ -267,18 +315,19 @@ h2 {
 
 .filter-pill {
   min-height: 40px;
-  border: 1px solid var(--line);
+  border: 3px solid var(--ink);
   border-radius: 999px;
   padding: 0 16px;
   background: white;
-  color: var(--muted);
+  color: var(--ink);
   font-weight: 850;
+  box-shadow: 3px 3px 0 var(--ink);
 }
 
 .filter-pill.active {
-  background: var(--teal);
-  color: white;
-  border-color: var(--teal);
+  background: var(--lemon);
+  color: var(--ink);
+  border-color: var(--ink);
 }
 
 .product-grid {
@@ -292,10 +341,21 @@ h2 {
   grid-template-rows: auto 1fr;
   overflow: hidden;
   min-height: 100%;
-  background: white;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: 0 10px 28px rgba(21, 21, 26, 0.06);
+  background: #ffffff;
+  border: 4px solid var(--ink);
+  border-radius: 18px;
+  box-shadow: 8px 8px 0 var(--ink);
+  transform: rotate(-0.5deg);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.product-card:nth-child(even) {
+  transform: rotate(0.7deg);
+}
+
+.product-card:hover {
+  transform: translate(-3px, -3px) rotate(0deg);
+  box-shadow: 12px 12px 0 var(--coral);
 }
 
 .product-card img {
@@ -308,7 +368,10 @@ h2 {
 .product-info {
   display: grid;
   gap: 12px;
-  padding: 16px;
+  padding: 18px;
+  background:
+    linear-gradient(90deg, rgba(255, 225, 77, 0.32), transparent),
+    white;
 }
 
 .product-info h3 {
@@ -327,15 +390,20 @@ h2 {
 .price {
   color: var(--ink);
   font-weight: 950;
+  background: var(--lemon);
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  padding: 4px 8px;
 }
 
 .add-button {
   min-height: 42px;
-  border: 0;
-  border-radius: 8px;
-  background: var(--lemon);
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--coral), var(--orange));
   color: var(--ink);
   font-weight: 950;
+  box-shadow: 4px 4px 0 var(--ink);
 }
 
 .bundle-band {
@@ -344,14 +412,17 @@ h2 {
   gap: clamp(24px, 5vw, 70px);
   align-items: center;
   padding: clamp(48px, 8vw, 100px) clamp(18px, 4vw, 54px);
-  background: #dff7f4;
-  border-block: 1px solid #b5e4de;
+  background:
+    radial-gradient(circle at 82% 24%, rgba(255, 225, 77, 0.72), transparent 11rem),
+    linear-gradient(135deg, #70dcff 0%, #ffb4dc 52%, #ffe88a 100%);
+  border-block: 4px solid var(--line);
 }
 
 .bundle-panel {
   background: var(--ink);
   color: white;
-  border-radius: 8px;
+  border: 4px solid white;
+  border-radius: 22px;
   padding: clamp(22px, 4vw, 36px);
   box-shadow: var(--shadow);
 }
@@ -365,8 +436,9 @@ h2 {
   margin-bottom: 18px;
   padding: 7px 10px;
   border-radius: 999px;
-  background: var(--coral);
-  color: white;
+  background: var(--lemon);
+  color: var(--ink);
+  border: 3px solid var(--ink);
   font-size: 0.78rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -398,9 +470,9 @@ h2 {
   gap: 14px;
   padding: clamp(18px, 4vw, 32px);
   background: white;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: 0 14px 36px rgba(21, 21, 26, 0.08);
+  border: 4px solid var(--ink);
+  border-radius: 22px;
+  box-shadow: 9px 9px 0 var(--ink);
 }
 
 label {
@@ -415,8 +487,8 @@ input,
 select,
 textarea {
   width: 100%;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
   background: #fffdfa;
   color: var(--ink);
   padding: 13px 12px;
@@ -438,12 +510,13 @@ textarea:focus {
   gap: 14px;
   padding: 14px;
   background: #fff5cf;
-  border-radius: 8px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
 }
 
 .bkash-button {
   width: 100%;
-  background: #e2136e;
+  background: linear-gradient(135deg, #e2136e, #ff6aa6);
   color: white;
 }
 
@@ -481,8 +554,11 @@ textarea:focus {
   width: min(420px, 100%);
   height: 100%;
   padding: 22px;
-  background: var(--paper);
+  background:
+    radial-gradient(circle at 20% 10%, rgba(255, 225, 77, 0.58), transparent 11rem),
+    var(--paper);
   box-shadow: var(--shadow);
+  border-left: 4px solid var(--ink);
 }
 
 .cart-header {
@@ -515,8 +591,8 @@ textarea:focus {
   align-items: center;
   padding: 10px;
   background: white;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
 }
 
 .cart-item img {
@@ -539,9 +615,9 @@ textarea:focus {
 .qty-button {
   width: 30px;
   height: 30px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: white;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: var(--lemon);
   font-weight: 900;
 }
 
@@ -555,7 +631,7 @@ textarea:focus {
   gap: 18px;
   padding: 30px clamp(18px, 4vw, 54px);
   color: var(--muted);
-  border-top: 1px solid var(--line);
+  border-top: 4px solid var(--line);
 }
 
 .site-footer strong {
@@ -609,7 +685,12 @@ textarea:focus {
 
   .hero::after {
     background:
-      linear-gradient(0deg, rgba(255, 253, 248, 0.98) 0%, rgba(255, 253, 248, 0.78) 48%, rgba(255, 253, 248, 0.18) 100%);
+      linear-gradient(0deg, rgba(255, 248, 239, 0.98) 0%, rgba(255, 248, 239, 0.78) 48%, rgba(255, 248, 239, 0.18) 100%);
+  }
+
+  .hero::before,
+  .section-shell::before {
+    display: none;
   }
 
   .hero-copy {

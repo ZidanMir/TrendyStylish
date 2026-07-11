@@ -28,7 +28,8 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(CustomerProfile)
 class CustomerProfileAdmin(admin.ModelAdmin):
-    list_display = ("user", "phone", "created_at")
+    list_display = ("user", "phone", "phone_verified_at", "email_verified_at", "created_at")
+    list_filter = ("phone_verified_at", "email_verified_at")
     search_fields = ("user__username", "user__email", "user__first_name", "user__last_name", "phone")
 
 
@@ -55,12 +56,13 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ("id", "customer_name", "user", "phone", "status", "payment_method", "coupon", "discount", "total", "created_at")
+    list_display = ("id", "customer_name", "email", "phone", "status", "payment_method", "coupon", "discount", "total", "created_at")
     list_filter = ("status", "payment_method", "area", "coupon", "created_at")
-    search_fields = ("customer_name", "phone", "address", "user__username", "user__email")
+    search_fields = ("customer_name", "email", "phone", "address", "user__username", "user__email")
     readonly_fields = (
         "user",
         "customer_name",
+        "email",
         "phone",
         "area",
         "address",

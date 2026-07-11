@@ -9,7 +9,7 @@
       content="Trendy Stylishness sells card games, cute accessories, stationery, and giftable fancy items for teenagers in Bangladesh."
     >
     <link rel="preload" as="image" href="assets/graduation-inspired-hero.jpg" fetchpriority="high">
-    <link rel="stylesheet" href="styles.css?v=20260711.2">
+    <link rel="stylesheet" href="styles.css?v=20260711.3">
   </head>
   <body>
     <header class="site-header">
@@ -149,6 +149,10 @@
             <input name="name" type="text" placeholder="Example: Afia Rahman" autocomplete="name" required>
           </label>
           <label>
+            Email for order updates
+            <input name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+          </label>
+          <label>
             Phone number
             <input name="phone" type="tel" placeholder="01XXXXXXXXX" autocomplete="tel" required>
           </label>
@@ -220,8 +224,25 @@
           </label>
           <label class="register-only">
             Phone
-            <input name="phone" type="tel" placeholder="01XXXXXXXXX" autocomplete="tel">
+            <input name="phone" type="tel" placeholder="01XXXXXXXXX" autocomplete="tel" required>
           </label>
+          <div class="phone-verification register-only">
+            <div class="verification-heading">
+              <strong>Verify phone</strong>
+              <span class="verification-state" id="phoneVerifyStatus">Required</span>
+            </div>
+            <div class="verification-method" role="group" aria-label="Receive verification code by">
+              <label><input type="radio" name="phoneChannel" value="sms" checked> Text message</label>
+              <label><input type="radio" name="phoneChannel" value="call"> Phone call</label>
+            </div>
+            <button class="inline-button ghost" type="button" data-send-phone-code>Send code</button>
+            <label>
+              Six-digit code
+              <input name="phoneCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000">
+            </label>
+            <button class="inline-button" type="button" data-verify-phone-code>Verify number</button>
+            <p class="form-note" id="phoneVerifyMessage" role="status"></p>
+          </div>
           <label class="register-only">
             Address
             <textarea name="address" rows="2" placeholder="House, road, area, district" autocomplete="street-address"></textarea>
@@ -233,6 +254,18 @@
           <div>
             <strong id="customerName">Signed in</strong>
             <span id="customerEmail"></span>
+          </div>
+          <div class="email-verification">
+            <div class="verification-heading">
+              <strong>Email verification</strong>
+              <span class="verification-state" id="emailVerifyStatus">Optional</span>
+            </div>
+            <button class="inline-button ghost" type="button" data-send-email-code>Send email code</button>
+            <div class="email-code-row" id="emailCodeRow" hidden>
+              <input id="emailCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Six-digit code" aria-label="Email verification code">
+              <button class="inline-button" type="button" data-verify-email-code>Verify email</button>
+            </div>
+            <p class="form-note" id="emailVerifyMessage" role="status"></p>
           </div>
           <strong>Your orders</strong>
           <div class="order-history" id="orderHistory"></div>
@@ -246,6 +279,6 @@
       <span>Cards, accessories, stationery, and easy order tracking.</span>
     </footer>
 
-    <script src="script.js?v=20260711.2"></script>
+    <script src="script.js?v=20260711.3"></script>
   </body>
 </html>

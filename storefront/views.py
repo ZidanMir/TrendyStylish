@@ -10,10 +10,23 @@ from django.core.validators import validate_email
 from django.db import IntegrityError, transaction
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_POST
 
 from .models import Coupon, CouponRedemption, CustomerProfile, Order, OrderItem, Product
+from .services import (
+    VerificationError,
+    consume_signup_phone_verification,
+    normalize_bangladesh_phone,
+    send_email_verification_code,
+    send_order_confirmation,
+    send_order_status_update,
+    send_phone_code,
+    signup_phone_is_verified,
+    verify_email_code,
+    verify_phone_code,
+)
 
 
 @ensure_csrf_cookie
@@ -60,6 +73,8 @@ def user_payload(user):
         "name": user.get_full_name() or user.username,
         "phone": profile.phone if profile else "",
         "address": profile.address if profile else "",
+        "phoneVerified": bool(profile and profile.phone_verified_at),
+        "emailVerified": bool(profile and profile.email_verified_at),
     }
 
 
@@ -73,6 +88,7 @@ def order_payload(order):
     return {
         "id": order.pk,
         "customerName": order.customer_name,
+        "email": order.email,
         "phone": order.phone,
         "area": order.area,
         "address": order.address,
@@ -98,7 +114,38 @@ def order_payload(order):
             }
             for item in order.items.all()
         ],
-    }
+}
+
+
+@require_POST
+def phone_verification_send_api(request):
+    try:
+        payload = json.loads(request.body or "{}")
+        phone = normalize_bangladesh_phone(payload.get("phone"))
+        if CustomerProfile.objects.filter(phone__in={phone, f"0{phone[4:]}"}).exists():
+            return JsonResponse({"error": "An account already exists with this phone number."}, status=400)
+        phone, debug_code = send_phone_code(request.session, phone, payload.get("channel") or "sms")
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON body."}, status=400)
+    except VerificationError as exc:
+        return JsonResponse({"error": str(exc)}, status=400)
+
+    response = {"phone": phone, "message": "Verification code sent."}
+    if debug_code:
+        response["debugCode"] = debug_code
+    return JsonResponse(response)
+
+
+@require_POST
+def phone_verification_check_api(request):
+    try:
+        payload = json.loads(request.body or "{}")
+        phone = verify_phone_code(request.session, payload.get("phone"), payload.get("code"))
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON body."}, status=400)
+    except VerificationError as exc:
+        return JsonResponse({"error": str(exc)}, status=400)
+    return JsonResponse({"phone": phone, "verified": True})
 
 
 @require_POST
@@ -111,7 +158,10 @@ def register_api(request):
     email = (payload.get("email") or "").strip().lower()
     password = payload.get("password") or ""
     name = (payload.get("name") or "").strip()
-    phone = (payload.get("phone") or "").strip()
+    try:
+        phone = normalize_bangladesh_phone(payload.get("phone"))
+    except VerificationError as exc:
+        return JsonResponse({"error": str(exc)}, status=400)
     address = (payload.get("address") or "").strip()
 
     if not email or not password:
@@ -124,12 +174,19 @@ def register_api(request):
         return JsonResponse({"error": "Password must be at least 8 characters."}, status=400)
     if not name:
         return JsonResponse({"error": "Enter your full name."}, status=400)
+    if not signup_phone_is_verified(request.session, phone):
+        return JsonResponse({"error": "Verify your phone number before creating the account."}, status=400)
     if User.objects.filter(username=email).exists():
         return JsonResponse({"error": "An account already exists with this email."}, status=400)
+    phone_aliases = {phone, f"0{phone[4:]}"}
+    if CustomerProfile.objects.filter(phone__in=phone_aliases).exists():
+        return JsonResponse({"error": "An account already exists with this phone number."}, status=400)
 
     first_name, _, last_name = name.partition(" ")
-    user = User.objects.create_user(username=email, email=email, password=password, first_name=first_name, last_name=last_name)
-    CustomerProfile.objects.create(user=user, phone=phone, address=address)
+    with transaction.atomic():
+        user = User.objects.create_user(username=email, email=email, password=password, first_name=first_name, last_name=last_name)
+        CustomerProfile.objects.create(user=user, phone=phone, phone_verified_at=timezone.now(), address=address)
+    consume_signup_phone_verification(request.session)
     login(request, user)
     return JsonResponse({"user": user_payload(user)}, status=201)
 
@@ -165,6 +222,38 @@ def me_api(request):
 
     orders = request.user.orders.select_related("coupon").prefetch_related("items")[:10]
     return JsonResponse({"user": user_payload(request.user), "orders": [order_payload(order) for order in orders]})
+
+
+@require_POST
+def email_verification_send_api(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Sign in before verifying email."}, status=401)
+    profile, _created = CustomerProfile.objects.get_or_create(user=request.user)
+    if profile.email_verified_at:
+        return JsonResponse({"verified": True, "message": "Email is already verified."})
+    try:
+        debug_code = send_email_verification_code(request.session, request.user)
+    except VerificationError as exc:
+        return JsonResponse({"error": str(exc)}, status=400)
+    response = {"message": "Verification code sent to your email."}
+    if debug_code:
+        response["debugCode"] = debug_code
+    return JsonResponse(response)
+
+
+@require_POST
+def email_verification_check_api(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Sign in before verifying email."}, status=401)
+    CustomerProfile.objects.get_or_create(user=request.user)
+    try:
+        payload = json.loads(request.body or "{}")
+        verify_email_code(request.session, request.user, payload.get("code"))
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON body."}, status=400)
+    except VerificationError as exc:
+        return JsonResponse({"error": str(exc)}, status=400)
+    return JsonResponse({"verified": True, "user": user_payload(request.user)})
 
 
 def staff_required_json(view_func):
@@ -218,7 +307,9 @@ def dashboard_order_status_api(request, order_id):
         return JsonResponse({"error": "Order not found."}, status=404)
 
     try:
-        order.set_status(status, user=request.user, note=(payload.get("note") or "").strip())
+        with transaction.atomic():
+            order.set_status(status, user=request.user, note=(payload.get("note") or "").strip())
+            transaction.on_commit(lambda: send_order_status_update(order))
     except ValueError:
         return JsonResponse(
             {"error": f"Order #{order.pk} cannot move from {order.get_status_display()} to that status."},
@@ -239,14 +330,26 @@ def orders_api(request):
         return JsonResponse({"error": "Add at least one product before checkout."}, status=400)
 
     customer_name = (payload.get("name") or "").strip()
-    phone = (payload.get("phone") or "").strip()
+    email = (payload.get("email") or (request.user.email if request.user.is_authenticated else "")).strip().lower()
+    try:
+        phone = normalize_bangladesh_phone(payload.get("phone"))
+    except VerificationError as exc:
+        return JsonResponse({"error": str(exc)}, status=400)
     address = (payload.get("address") or "").strip()
     if not customer_name:
         return JsonResponse({"error": "Enter the customer name."}, status=400)
-    if len(phone) < 8:
-        return JsonResponse({"error": "Enter a valid phone number."}, status=400)
+    try:
+        validate_email(email)
+    except ValidationError:
+        return JsonResponse({"error": "Enter a valid email for order updates."}, status=400)
     if not address:
         return JsonResponse({"error": "Enter the delivery address."}, status=400)
+
+    profile = None
+    if request.user.is_authenticated:
+        profile, _created = CustomerProfile.objects.get_or_create(user=request.user)
+        if profile.phone_verified_at and profile.phone != phone:
+            return JsonResponse({"error": "Use the verified phone number saved on your account."}, status=400)
 
     product_ids = [item.get("id") for item in items if isinstance(item, dict)]
     if len(product_ids) != len(items) or len(set(product_ids)) != len(product_ids):
@@ -297,6 +400,7 @@ def orders_api(request):
             order = Order.objects.create(
                 user=request.user if request.user.is_authenticated else None,
                 customer_name=customer_name,
+                email=email,
                 phone=phone,
                 area=area,
                 address=address,
@@ -322,14 +426,14 @@ def orders_api(request):
                 ]
             )
 
-            if request.user.is_authenticated:
-                profile, _created = CustomerProfile.objects.get_or_create(user=request.user)
+            if profile:
                 profile.phone = order.phone
                 profile.address = order.address
                 profile.save(update_fields=["phone", "address"])
 
             if coupon and request.user.is_authenticated:
                 CouponRedemption.objects.create(coupon=coupon, user=request.user, order=order, discount=discount)
+            transaction.on_commit(lambda: send_order_confirmation(order))
     except IntegrityError:
         return JsonResponse({"error": "You have already used this coupon."}, status=400)
 
@@ -344,7 +448,7 @@ def orders_api(request):
             "coupon": order.coupon.code if order.coupon else "",
             "status": order.status,
             "statusLabel": order.get_status_display(),
-            "message": "Order placed. The shop will review and confirm it.",
+            "message": "Order placed. Confirmation and tracking updates will be emailed.",
         },
         status=201,
     )

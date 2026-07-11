@@ -1264,6 +1264,85 @@ textarea {
   }
 }
 
+.phone-verification,
+.email-verification {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(198, 255, 0, 0.28);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.verification-heading,
+.email-code-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.verification-state {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #ff173f;
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.verification-state.verified {
+  background: var(--teal);
+  color: #050407;
+}
+
+.verification-method {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.verification-method label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  color: var(--cream);
+  cursor: pointer;
+}
+
+.verification-method label:has(input:checked) {
+  border-color: var(--teal);
+  background: rgba(198, 255, 0, 0.12);
+}
+
+.verification-method input {
+  width: auto;
+  margin: 0;
+}
+
+.email-code-row input {
+  flex: 1;
+}
+
+@media (max-width: 420px) {
+  .verification-method,
+  .email-code-row {
+    grid-template-columns: 1fr;
+  }
+
+  .email-code-row {
+    display: grid;
+  }
+}
+
 /* Workflow clarity refinements */
 .product-card,
 .checkout-form,

@@ -17,6 +17,10 @@ urlpatterns = [
     path("api/auth/login/", views.login_api, name="login_api"),
     path("api/auth/logout/", views.logout_api, name="logout_api"),
     path("api/auth/me/", views.me_api, name="me_api"),
+    path("api/auth/phone/send/", views.phone_verification_send_api, name="phone_verification_send_api"),
+    path("api/auth/phone/verify/", views.phone_verification_check_api, name="phone_verification_check_api"),
+    path("api/auth/email/send/", views.email_verification_send_api, name="email_verification_send_api"),
+    path("api/auth/email/verify/", views.email_verification_check_api, name="email_verification_check_api"),
     path("api/dashboard/orders/", views.dashboard_orders_api, name="dashboard_orders_api"),
     path("api/dashboard/orders/<int:order_id>/status/", views.dashboard_order_status_api, name="dashboard_order_status_api"),
 ]

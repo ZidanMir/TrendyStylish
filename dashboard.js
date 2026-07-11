@@ -64,7 +64,7 @@ function renderOrders(orders) {
             <div>
               <span class="message-label">${order.status === "pending" ? "Needs review" : "Order update"}</span>
               <h2>#${order.id} ${escapeHtml(order.customerName)}</h2>
-              <p>${escapeHtml(order.phone)} | ${order.area === "inside" ? "Inside Dhaka" : "Outside Dhaka"} | ${formatDate(order.createdAt)}</p>
+              <p>${escapeHtml(order.phone)} | ${escapeHtml(order.email)} | ${order.area === "inside" ? "Inside Dhaka" : "Outside Dhaka"} | ${formatDate(order.createdAt)}</p>
             </div>
             <span class="status-pill status-${escapeHtml(order.status)}">${escapeHtml(order.statusLabel)}</span>
           </div>

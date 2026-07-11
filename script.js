@@ -57,6 +57,12 @@ const authForm = document.querySelector("#authForm");
 const authTabs = document.querySelector(".auth-tabs");
 const authButton = document.querySelector("#authButton");
 const authMessage = document.querySelector("#authMessage");
+const phoneVerifyStatus = document.querySelector("#phoneVerifyStatus");
+const phoneVerifyMessage = document.querySelector("#phoneVerifyMessage");
+const emailVerifyStatus = document.querySelector("#emailVerifyStatus");
+const emailVerifyMessage = document.querySelector("#emailVerifyMessage");
+const emailCodeRow = document.querySelector("#emailCodeRow");
+const emailCode = document.querySelector("#emailCode");
 const customerPanel = document.querySelector("#customerPanel");
 const customerName = document.querySelector("#customerName");
 const customerEmail = document.querySelector("#customerEmail");
@@ -64,6 +70,7 @@ const orderHistory = document.querySelector("#orderHistory");
 let authMode = "login";
 let currentCustomer = null;
 let customerOrders = [];
+let verifiedSignupPhone = "";
 
 const HTML_ESCAPES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" };
 
@@ -198,7 +205,105 @@ function setAuthMode(mode) {
   passwordInput.minLength = mode === "register" ? 8 : 0;
   passwordInput.placeholder = mode === "register" ? "At least 8 characters" : "Your password";
   authForm.elements.name.required = mode === "register";
+  authForm.elements.phone.required = mode === "register";
+  syncAuthSubmitState();
   authMessage.textContent = "";
+}
+
+function syncAuthSubmitState() {
+  authButton.disabled = authMode === "register" && !verifiedSignupPhone;
+}
+
+function resetPhoneVerification() {
+  verifiedSignupPhone = "";
+  phoneVerifyStatus.textContent = "Required";
+  phoneVerifyStatus.classList.remove("verified");
+  phoneVerifyMessage.textContent = "";
+  syncAuthSubmitState();
+}
+
+async function sendPhoneVerificationCode() {
+  const phone = authForm.elements.phone.value;
+  const channel = authForm.querySelector("input[name='phoneChannel']:checked")?.value || "sms";
+  phoneVerifyMessage.textContent = channel === "call" ? "Requesting phone call..." : "Sending text message...";
+  try {
+    const response = await fetch(`${API_BASE}/api/auth/phone/send/`, {
+      method: "POST",
+      credentials: "same-origin",
+      headers: csrfHeaders(),
+      body: JSON.stringify({ phone, channel }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Could not send verification code.");
+    authForm.elements.phone.value = data.phone;
+    if (data.debugCode) authForm.elements.phoneCode.value = data.debugCode;
+    phoneVerifyMessage.textContent = data.debugCode
+      ? `Local test code: ${data.debugCode}`
+      : channel === "call" ? "Answer the call and enter the code." : "Code sent by text message.";
+  } catch (error) {
+    phoneVerifyMessage.textContent = error.message;
+  }
+}
+
+async function checkPhoneVerificationCode() {
+  phoneVerifyMessage.textContent = "Checking code...";
+  try {
+    const response = await fetch(`${API_BASE}/api/auth/phone/verify/`, {
+      method: "POST",
+      credentials: "same-origin",
+      headers: csrfHeaders(),
+      body: JSON.stringify({ phone: authForm.elements.phone.value, code: authForm.elements.phoneCode.value }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Phone verification failed.");
+    verifiedSignupPhone = data.phone;
+    authForm.elements.phone.value = data.phone;
+    phoneVerifyStatus.textContent = "Verified";
+    phoneVerifyStatus.classList.add("verified");
+    phoneVerifyMessage.textContent = "Phone number verified. You can create your account.";
+    syncAuthSubmitState();
+  } catch (error) {
+    resetPhoneVerification();
+    phoneVerifyMessage.textContent = error.message;
+  }
+}
+
+async function sendEmailVerificationCode() {
+  emailVerifyMessage.textContent = "Sending verification email...";
+  try {
+    const response = await fetch(`${API_BASE}/api/auth/email/send/`, {
+      method: "POST",
+      credentials: "same-origin",
+      headers: csrfHeaders(),
+      body: "{}",
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Could not send verification email.");
+    emailCodeRow.hidden = false;
+    if (data.debugCode) emailCode.value = data.debugCode;
+    emailVerifyMessage.textContent = data.debugCode ? `Local test code: ${data.debugCode}` : data.message;
+  } catch (error) {
+    emailVerifyMessage.textContent = error.message;
+  }
+}
+
+async function checkEmailVerificationCode() {
+  emailVerifyMessage.textContent = "Checking code...";
+  try {
+    const response = await fetch(`${API_BASE}/api/auth/email/verify/`, {
+      method: "POST",
+      credentials: "same-origin",
+      headers: csrfHeaders(),
+      body: JSON.stringify({ code: emailCode.value }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Email verification failed.");
+    currentCustomer = data.user;
+    emailVerifyMessage.textContent = "Email verified.";
+    renderCustomer();
+  } catch (error) {
+    emailVerifyMessage.textContent = error.message;
+  }
 }
 
 function renderCustomer() {
@@ -222,11 +327,17 @@ function renderCustomer() {
 
   customerName.textContent = currentCustomer.name;
   customerEmail.textContent = currentCustomer.email;
+  emailVerifyStatus.textContent = currentCustomer.emailVerified ? "Verified" : "Optional";
+  emailVerifyStatus.classList.toggle("verified", currentCustomer.emailVerified);
+  customerPanel.querySelector("[data-send-email-code]").hidden = currentCustomer.emailVerified;
+  if (currentCustomer.emailVerified) emailCodeRow.hidden = true;
   const nameInput = checkoutForm.elements.name;
+  const emailInput = checkoutForm.elements.email;
   const phoneInput = checkoutForm.elements.phone;
   const addressInput = checkoutForm.elements.address;
 
   if (!nameInput.value) nameInput.value = currentCustomer.name || "";
+  if (!emailInput.value) emailInput.value = currentCustomer.email || "";
   if (!phoneInput.value) phoneInput.value = currentCustomer.phone || "";
   if (!addressInput.value) addressInput.value = currentCustomer.address || "";
 
@@ -267,6 +378,10 @@ async function loadCustomer() {
 
 async function submitAuth(event) {
   event.preventDefault();
+  if (authMode === "register" && !verifiedSignupPhone) {
+    authMessage.textContent = "Verify your phone number before creating the account.";
+    return;
+  }
   const formData = new FormData(authForm);
   const payload = {
     email: formData.get("email"),
@@ -294,12 +409,13 @@ async function submitAuth(event) {
     currentCustomer = data.user;
     customerOrders = [];
     authForm.reset();
+    verifiedSignupPhone = "";
     authMessage.textContent = "";
     renderCustomer();
   } catch (error) {
     authMessage.textContent = error.message;
   } finally {
-    authButton.disabled = false;
+    syncAuthSubmitState();
   }
 }
 
@@ -355,6 +471,22 @@ document.addEventListener("click", (event) => {
     setAuthMode(authModeButton.dataset.authMode);
   }
 
+  if (event.target.closest("[data-send-phone-code]")) {
+    sendPhoneVerificationCode();
+  }
+
+  if (event.target.closest("[data-verify-phone-code]")) {
+    checkPhoneVerificationCode();
+  }
+
+  if (event.target.closest("[data-send-email-code]")) {
+    sendEmailVerificationCode();
+  }
+
+  if (event.target.closest("[data-verify-email-code]")) {
+    checkEmailVerificationCode();
+  }
+
   if (event.target.closest("[data-logout]")) {
     logoutCustomer();
   }
@@ -384,6 +516,7 @@ paymentMethods.forEach((method) => {
 });
 
 authForm.addEventListener("submit", submitAuth);
+authForm.elements.phone.addEventListener("input", resetPhoneVerification);
 
 async function loadProducts() {
   try {
@@ -417,6 +550,7 @@ checkoutForm.addEventListener("submit", async (event) => {
   const payload = {
     paymentMethod,
     name: formData.get("name"),
+    email: formData.get("email"),
     phone: formData.get("phone"),
     area: formData.get("area"),
     address: formData.get("address"),

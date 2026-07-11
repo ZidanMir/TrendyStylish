@@ -39,7 +39,9 @@ class Product(models.Model):
 
 class CustomerProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="customer_profile", on_delete=models.CASCADE)
-    phone = models.CharField(max_length=24, blank=True)
+    phone = models.CharField(max_length=24, blank=True, db_index=True)
+    phone_verified_at = models.DateTimeField(blank=True, null=True)
+    email_verified_at = models.DateTimeField(blank=True, null=True)
     address = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -106,6 +108,7 @@ class Order(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, related_name="orders", on_delete=models.SET_NULL)
     customer_name = models.CharField(max_length=120)
+    email = models.EmailField(blank=True)
     phone = models.CharField(max_length=24)
     area = models.CharField(max_length=16, choices=AREA_CHOICES)
     address = models.TextField()

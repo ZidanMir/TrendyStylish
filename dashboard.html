@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Dashboard - Trendy Stylishness</title>
+    <link rel="stylesheet" href="/styles.css?v=20260711.2">
+  </head>
+  <body class="dashboard-body">
+    <header class="site-header admin-header">
+      <a class="brand" href="/" aria-label="Trendy Stylishness home">
+        <span class="brand-mark">TS</span>
+        <span>Admin Dashboard</span>
+      </a>
+      <nav class="main-nav" aria-label="Admin navigation">
+        <a href="/">Storefront</a>
+        <a href="/admin/">Store settings</a>
+      </nav>
+    </header>
+
+    <main class="admin-shell">
+      <section class="admin-hero" aria-labelledby="dashboard-title">
+        <p class="eyebrow">Order desk</p>
+        <h1 id="dashboard-title">Manage orders</h1>
+        <p>Accept pending orders, then mark them delivered when the customer receives the parcel.</p>
+        <nav class="admin-tools" aria-label="Store management shortcuts">
+          <a href="/admin/storefront/product/">Products</a>
+          <a href="/admin/storefront/product/add/">Add product</a>
+          <a href="/admin/auth/user/">Customers</a>
+          <a href="/admin/storefront/coupon/">Coupons</a>
+        </nav>
+      </section>
+
+      <section class="admin-stats" aria-label="Order status totals">
+        <button class="stat-card active" type="button" data-status="">
+          <span>All</span>
+          <strong id="statAll">0</strong>
+        </button>
+        <button class="stat-card urgent" type="button" data-status="pending">
+          <span>Pending</span>
+          <strong id="statPending">0</strong>
+        </button>
+        <button class="stat-card" type="button" data-status="confirmed">
+          <span>Confirmed</span>
+          <strong id="statConfirmed">0</strong>
+        </button>
+        <button class="stat-card" type="button" data-status="received">
+          <span>Delivered</span>
+          <strong id="statReceived">0</strong>
+        </button>
+        <button class="stat-card" type="button" data-status="cancelled">
+          <span>Cancelled</span>
+          <strong id="statCancelled">0</strong>
+        </button>
+      </section>
+
+      <section class="admin-orders" id="adminOrders" aria-live="polite"></section>
+      <p class="form-note" id="dashboardMessage" role="status"></p>
+    </main>
+
+    <script src="/dashboard.js?v=20260711.2"></script>
+  </body>
+</html>

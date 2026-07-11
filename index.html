@@ -9,7 +9,7 @@
       content="Trendy Stylishness sells card games, cute accessories, stationery, and giftable fancy items for teenagers in Bangladesh."
     >
     <link rel="preload" as="image" href="assets/graduation-inspired-hero.jpg" fetchpriority="high">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=20260711.2">
   </head>
   <body>
     <header class="site-header">
@@ -21,11 +21,17 @@
         <a href="#shop">Shop</a>
         <a href="#bundles">Bundles</a>
         <a href="#checkout">Checkout</a>
+        <a href="/dashboard/">Staff</a>
       </nav>
-      <button class="cart-button" type="button" data-open-cart aria-label="Open cart">
-        <span class="cart-icon" aria-hidden="true">Bag</span>
-        <span id="cartCount">0</span>
-      </button>
+      <div class="header-actions">
+        <button class="account-button" type="button" data-open-account>
+          <span id="accountLabel">Sign in</span>
+        </button>
+        <button class="cart-button" type="button" data-open-cart aria-label="Open cart">
+          <span class="cart-icon" aria-hidden="true">Bag</span>
+          <span id="cartCount">0</span>
+        </button>
+      </div>
     </header>
 
     <main id="top">
@@ -60,11 +66,11 @@
       <section class="trust-strip" aria-label="Store highlights">
         <div>
           <strong>Payment choice</strong>
-          <span>bKash online or cash on delivery</span>
+          <span>bKash preference or cash on delivery</span>
         </div>
         <div>
           <strong>Delivery ready</strong>
-          <span>Steadfast courier quote placeholder</span>
+          <span>Inside and outside Dhaka delivery rates</span>
         </div>
         <div>
           <strong>Drop energy</strong>
@@ -109,20 +115,25 @@
       <section class="checkout-preview" id="checkout" aria-labelledby="checkout-title">
         <div class="checkout-copy">
           <p class="eyebrow">Payment and delivery</p>
-          <h2 id="checkout-title">Light backend, real checkout path</h2>
+          <h2 id="checkout-title">Checkout with status tracking</h2>
           <p>
-            The frontend is ready for API calls. In production, your server can create bKash
-            payments or cash-on-delivery orders, then send the consignment to Steadfast.
+            Sign in before ordering to save your checkout, track order status, and redeem coupons
+            when new drops go live.
           </p>
         </div>
         <form class="checkout-form" id="checkoutForm">
+          <div class="account-summary" id="accountSummary">
+            <strong>Customer account</strong>
+            <span id="checkoutAccountText">Sign in to save orders, track history, and redeem coupons.</span>
+            <button class="inline-button" type="button" data-open-account>Sign in or create account</button>
+          </div>
           <fieldset class="payment-method">
             <legend>Payment method</legend>
             <label class="payment-option">
               <input type="radio" name="paymentMethod" value="bkash" checked>
               <span>
                 <strong>bKash</strong>
-                <small>Pay online before delivery</small>
+                <small>Shop sends payment instructions after confirmation</small>
               </span>
             </label>
             <label class="payment-option">
@@ -135,11 +146,11 @@
           </fieldset>
           <label>
             Customer name
-            <input name="name" type="text" placeholder="Example: Afia Rahman" required>
+            <input name="name" type="text" placeholder="Example: Afia Rahman" autocomplete="name" required>
           </label>
           <label>
             Phone number
-            <input name="phone" type="tel" placeholder="01XXXXXXXXX" required>
+            <input name="phone" type="tel" placeholder="01XXXXXXXXX" autocomplete="tel" required>
           </label>
           <label>
             Delivery area
@@ -150,11 +161,16 @@
           </label>
           <label>
             Address
-            <textarea name="address" rows="3" placeholder="House, road, area, district" required></textarea>
+            <textarea name="address" rows="3" placeholder="House, road, area, district" autocomplete="street-address" required></textarea>
           </label>
-          <div class="checkout-summary">
-            <span>Estimated delivery</span>
-            <strong id="deliveryFee">Tk 70</strong>
+          <label>
+            Coupon code
+            <input name="couponCode" type="text" placeholder="Example: TEEN10">
+          </label>
+          <div class="order-summary" aria-label="Order total estimate">
+            <div><span>Cart subtotal</span><strong id="checkoutSubtotal">Tk 0</strong></div>
+            <div><span>Delivery</span><strong id="deliveryFee">Tk 70</strong></div>
+            <div class="order-summary-total"><span>Estimated total</span><strong id="checkoutEstimate">Tk 70</strong></div>
           </div>
           <button class="bkash-button" id="checkoutButton" type="submit">Continue with bKash</button>
           <p class="form-note" id="checkoutMessage" role="status"></p>
@@ -178,11 +194,58 @@
       </div>
     </aside>
 
+    <aside class="account-modal" id="accountModal" aria-label="Customer account" aria-hidden="true">
+      <div class="cart-overlay" data-close-account></div>
+      <div class="account-panel">
+        <div class="cart-header">
+          <h2>Customer account</h2>
+          <button type="button" class="icon-button" data-close-account aria-label="Close account panel">X</button>
+        </div>
+        <div class="auth-tabs" role="tablist" aria-label="Account actions">
+          <button class="auth-tab active" type="button" data-auth-mode="login">Login</button>
+          <button class="auth-tab" type="button" data-auth-mode="register">Sign up</button>
+        </div>
+        <form class="auth-form" id="authForm">
+          <label class="register-only">
+            Full name
+            <input name="name" type="text" placeholder="Example: Afia Rahman" autocomplete="name">
+          </label>
+          <label>
+            Email
+            <input name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+          </label>
+          <label>
+            Password
+            <input name="password" type="password" placeholder="Your password" autocomplete="current-password" required>
+          </label>
+          <label class="register-only">
+            Phone
+            <input name="phone" type="tel" placeholder="01XXXXXXXXX" autocomplete="tel">
+          </label>
+          <label class="register-only">
+            Address
+            <textarea name="address" rows="2" placeholder="House, road, area, district" autocomplete="street-address"></textarea>
+          </label>
+          <button class="bkash-button" id="authButton" type="submit">Login</button>
+          <p class="form-note" id="authMessage" role="status"></p>
+        </form>
+        <div class="customer-panel" id="customerPanel" hidden>
+          <div>
+            <strong id="customerName">Signed in</strong>
+            <span id="customerEmail"></span>
+          </div>
+          <strong>Your orders</strong>
+          <div class="order-history" id="orderHistory"></div>
+          <button class="inline-button" type="button" data-logout>Logout</button>
+        </div>
+      </div>
+    </aside>
+
     <footer class="site-footer">
       <strong>Trendy Stylishness</strong>
-      <span>Small item shop concept for teens. Built as a frontend-first storefront.</span>
+      <span>Cards, accessories, stationery, and easy order tracking.</span>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=20260711.2"></script>
   </body>
 </html>

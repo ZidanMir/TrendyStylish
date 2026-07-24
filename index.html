@@ -148,14 +148,31 @@
             Customer name
             <input name="name" type="text" placeholder="Example: Afia Rahman" autocomplete="name" required>
           </label>
-          <label>
-            Email for order updates
-            <input name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
-          </label>
-          <label>
-            Phone number
-            <input name="phone" type="tel" placeholder="01XXXXXXXXX" autocomplete="tel" required>
-          </label>
+          <div class="order-email-note" id="orderEmailNote">
+            <strong>Order notifications</strong>
+            <span>Sign in to receive confirmation and tracking updates at your registered email.</span>
+          </div>
+          <fieldset class="delivery-phone-choice" id="deliveryPhoneChoice">
+            <legend>Delivery phone number</legend>
+            <label class="phone-choice">
+              <input type="radio" name="deliveryPhoneMode" value="registered" checked>
+              <span>
+                <strong>Use registered number</strong>
+                <small id="registeredPhoneText">Available after sign in</small>
+              </span>
+            </label>
+            <label class="phone-choice">
+              <input type="radio" name="deliveryPhoneMode" value="custom">
+              <span>
+                <strong>Use another delivery number</strong>
+                <small>For the person receiving the parcel</small>
+              </span>
+            </label>
+            <label id="deliveryPhoneInput" hidden>
+              Delivery phone number
+              <input name="deliveryPhone" type="tel" placeholder="01XXXXXXXXX" autocomplete="tel">
+            </label>
+          </fieldset>
           <label>
             Delivery area
             <select name="area" id="deliveryArea">

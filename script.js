@@ -53,6 +53,10 @@ const accountModal = document.querySelector("#accountModal");
 const accountLabel = document.querySelector("#accountLabel");
 const accountSummary = document.querySelector("#accountSummary");
 const checkoutAccountText = document.querySelector("#checkoutAccountText");
+const orderEmailNote = document.querySelector("#orderEmailNote");
+const registeredPhoneText = document.querySelector("#registeredPhoneText");
+const deliveryPhoneInput = document.querySelector("#deliveryPhoneInput");
+const deliveryPhoneModes = document.querySelectorAll("input[name='deliveryPhoneMode']");
 const authForm = document.querySelector("#authForm");
 const authTabs = document.querySelector(".auth-tabs");
 const authButton = document.querySelector("#authButton");
@@ -322,6 +326,7 @@ function renderCustomer() {
     customerName.textContent = "";
     customerEmail.textContent = "";
     orderHistory.innerHTML = "";
+    updateDeliveryContact();
     return;
   }
 
@@ -332,14 +337,11 @@ function renderCustomer() {
   customerPanel.querySelector("[data-send-email-code]").hidden = currentCustomer.emailVerified;
   if (currentCustomer.emailVerified) emailCodeRow.hidden = true;
   const nameInput = checkoutForm.elements.name;
-  const emailInput = checkoutForm.elements.email;
-  const phoneInput = checkoutForm.elements.phone;
   const addressInput = checkoutForm.elements.address;
 
   if (!nameInput.value) nameInput.value = currentCustomer.name || "";
-  if (!emailInput.value) emailInput.value = currentCustomer.email || "";
-  if (!phoneInput.value) phoneInput.value = currentCustomer.phone || "";
   if (!addressInput.value) addressInput.value = currentCustomer.address || "";
+  updateDeliveryContact();
 
   orderHistory.innerHTML = customerOrders.length
     ? customerOrders
@@ -361,6 +363,27 @@ function renderCustomer() {
         )
         .join("")
     : `<p class="form-note">No saved orders yet.</p>`;
+}
+
+function updateDeliveryContact() {
+  const registeredMode = checkoutForm.querySelector("input[name='deliveryPhoneMode'][value='registered']");
+  const customMode = checkoutForm.querySelector("input[name='deliveryPhoneMode'][value='custom']");
+  const customPhone = checkoutForm.elements.deliveryPhone;
+  const registeredPhone = currentCustomer?.phone || "";
+  const canUseRegisteredPhone = Boolean(currentCustomer && registeredPhone);
+
+  orderEmailNote.querySelector("span").textContent = currentCustomer
+    ? `Confirmation and tracking updates will go to ${currentCustomer.email}.`
+    : "Sign in to receive confirmation and tracking updates at your registered email.";
+  registeredPhoneText.textContent = canUseRegisteredPhone
+    ? `Registered: ${registeredPhone}`
+    : "No registered number available";
+  registeredMode.disabled = !canUseRegisteredPhone;
+
+  if (!canUseRegisteredPhone && registeredMode.checked) customMode.checked = true;
+  const useCustomPhone = customMode.checked;
+  deliveryPhoneInput.hidden = !useCustomPhone;
+  customPhone.required = useCustomPhone;
 }
 
 async function loadCustomer() {
@@ -515,6 +538,10 @@ paymentMethods.forEach((method) => {
   method.addEventListener("change", updatePaymentMethod);
 });
 
+deliveryPhoneModes.forEach((mode) => {
+  mode.addEventListener("change", updateDeliveryContact);
+});
+
 authForm.addEventListener("submit", submitAuth);
 authForm.elements.phone.addEventListener("input", resetPhoneVerification);
 
@@ -545,13 +572,18 @@ checkoutForm.addEventListener("submit", async (event) => {
     checkoutMessage.textContent = "Add items to cart before starting checkout.";
     return;
   }
+  if (!currentCustomer) {
+    checkoutMessage.textContent = "Sign in before placing an order so updates can reach your registered email.";
+    accountModal.classList.add("open");
+    return;
+  }
 
   const formData = new FormData(checkoutForm);
   const payload = {
     paymentMethod,
     name: formData.get("name"),
-    email: formData.get("email"),
-    phone: formData.get("phone"),
+    deliveryPhoneMode: formData.get("deliveryPhoneMode"),
+    deliveryPhone: formData.get("deliveryPhone"),
     area: formData.get("area"),
     address: formData.get("address"),
     couponCode: formData.get("couponCode"),
@@ -578,6 +610,7 @@ checkoutForm.addEventListener("submit", async (event) => {
     cart.clear();
     updateCart();
     checkoutForm.reset();
+    updateDeliveryContact();
     updatePaymentMethod();
     updateCheckoutTotals();
     loadCustomer();

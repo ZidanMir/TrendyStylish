@@ -3,6 +3,7 @@ import json
 from django.contrib.auth.models import User
 from django.core import mail
 from django.test import TestCase, override_settings
+from django.utils import timezone
 
 from .models import Coupon, CouponRedemption, CustomerProfile, Order, Product
 
@@ -27,6 +28,13 @@ class StorefrontApiTests(TestCase):
 
     def test_orders_api_saves_order_items_from_current_prices(self):
         product = Product.objects.get(slug="party-cards")
+        user = User.objects.create_user(username="afia@example.com", email="afia@example.com", password="secret12345")
+        profile = CustomerProfile.objects.create(
+            user=user,
+            phone="+8801700000001",
+            phone_verified_at=timezone.now(),
+        )
+        self.client.force_login(user)
         with self.captureOnCommitCallbacks(execute=True):
             response = self.client.post(
                 "/api/orders/",
@@ -34,8 +42,9 @@ class StorefrontApiTests(TestCase):
                     {
                         "paymentMethod": "cod",
                         "name": "Afia Rahman",
-                        "email": "afia@example.com",
-                        "phone": "01700000000",
+                        "email": "other@example.com",
+                        "deliveryPhoneMode": "custom",
+                        "deliveryPhone": "01700000000",
                         "area": "inside",
                         "address": "Dhanmondi, Dhaka",
                         "items": [{"id": product.slug, "quantity": 2}],
@@ -52,11 +61,16 @@ class StorefrontApiTests(TestCase):
         self.assertEqual(order.status, Order.STATUS_PENDING)
         self.assertEqual(order.items.count(), 1)
         self.assertEqual(order.phone, "+8801700000000")
+        self.assertEqual(order.email, user.email)
+        profile.refresh_from_db()
+        self.assertEqual(profile.phone, "+8801700000001")
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn(f"Order #{order.pk} received", mail.outbox[0].subject)
 
     def test_orders_api_rejects_incomplete_customer_details(self):
         product = Product.objects.get(slug="party-cards")
+        user = User.objects.create_user(username="afia@example.com", email="afia@example.com", password="secret12345")
+        self.client.force_login(user)
 
         response = self.client.post(
             "/api/orders/",
@@ -204,3 +218,80 @@ class StorefrontApiTests(TestCase):
         order.refresh_from_db()
         self.assertEqual(order.get_status_display(), "Delivered")
         self.assertEqual(len(mail.outbox), 2)
+
+    def test_admin_root_redirects_staff_to_branded_dashboard(self):
+        staff = User.objects.create_user(username="manager@example.com", password="secret12345", is_staff=True)
+        self.client.force_login(staff)
+
+        response = self.client.get("/admin/")
+
+        self.assertRedirects(response, "/dashboard/", fetch_redirect_response=False)
+
+    def test_staff_dashboard_manages_products_customers_and_coupons(self):
+        staff = User.objects.create_user(username="manager@example.com", password="secret12345", is_staff=True)
+        customer = User.objects.create_user(
+            username="customer@example.com",
+            email="customer@example.com",
+            password="secret12345",
+            first_name="Customer",
+        )
+        CustomerProfile.objects.create(user=customer, phone="+8801700000002", phone_verified_at=timezone.now())
+        self.client.force_login(staff)
+
+        overview = self.client.get("/api/dashboard/overview/")
+        self.assertEqual(overview.status_code, 200)
+        self.assertEqual(overview.json()["stats"]["customers"], 1)
+
+        created = self.client.post(
+            "/api/dashboard/products/create/",
+            data={
+                "name": "Dashboard Test Product",
+                "category": Product.CATEGORY_ACCESSORIES,
+                "price": "225",
+                "tag": "New",
+                "sortOrder": "5",
+                "staticImagePath": "assets/accessory-bundle.png",
+                "isActive": "true",
+            },
+        )
+        self.assertEqual(created.status_code, 201)
+        product_id = created.json()["product"]["databaseId"]
+
+        hidden = self.client.post(
+            f"/api/dashboard/products/{product_id}/update/",
+            data={
+                "name": "Dashboard Test Product",
+                "category": Product.CATEGORY_ACCESSORIES,
+                "price": "225",
+                "tag": "New",
+                "sortOrder": "5",
+                "staticImagePath": "assets/accessory-bundle.png",
+                "isActive": "false",
+            },
+        )
+        self.assertEqual(hidden.status_code, 200)
+        self.assertFalse(hidden.json()["product"]["isActive"])
+
+        customers = self.client.get("/api/dashboard/customers/")
+        self.assertEqual(customers.status_code, 200)
+        self.assertEqual(customers.json()["customers"][0]["email"], customer.email)
+
+        coupon = self.client.post(
+            "/api/dashboard/coupons/create/",
+            data=json.dumps(
+                {
+                    "code": "DASH15",
+                    "discountType": Coupon.DISCOUNT_PERCENT,
+                    "value": 15,
+                    "isActive": True,
+                    "singleUse": True,
+                }
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(coupon.status_code, 201)
+        self.assertTrue(coupon.json()["coupon"]["isActive"])
+
+        deleted = self.client.post(f"/api/dashboard/products/{product_id}/delete/", data="{}", content_type="application/json")
+        self.assertEqual(deleted.status_code, 200)
+        self.assertFalse(Product.objects.filter(pk=product_id).exists())

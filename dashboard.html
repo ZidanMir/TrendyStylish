@@ -3,61 +3,242 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin Dashboard - Trendy Stylishness</title>
-    <link rel="stylesheet" href="/styles.css?v=20260711.3">
+    <title>Store Dashboard - Trendy Stylishness</title>
+    <link rel="stylesheet" href="/styles.css?v=20260712.1">
+    <link rel="stylesheet" href="/dashboard.css?v=20260712.1">
   </head>
-  <body class="dashboard-body">
-    <header class="site-header admin-header">
-      <a class="brand" href="/" aria-label="Trendy Stylishness home">
-        <span class="brand-mark">TS</span>
-        <span>Admin Dashboard</span>
-      </a>
-      <nav class="main-nav" aria-label="Admin navigation">
-        <a href="/">Storefront</a>
-        <a href="/admin/">Store settings</a>
-      </nav>
-    </header>
+  <body class="dashboard-v2">
+    <div class="admin-app">
+      <aside class="admin-sidebar" id="adminSidebar">
+        <a class="admin-brand" href="/dashboard/" aria-label="Trendy Stylishness dashboard">
+          <img src="/assets/trendy-stylishness-logo-transparent.png" alt="">
+          <span>
+            <strong>Trendy Stylishness</strong>
+            <small>Store workspace</small>
+          </span>
+        </a>
 
-    <main class="admin-shell">
-      <section class="admin-hero" aria-labelledby="dashboard-title">
-        <p class="eyebrow">Order desk</p>
-        <h1 id="dashboard-title">Manage orders</h1>
-        <p>Accept pending orders, then mark them delivered when the customer receives the parcel.</p>
-        <nav class="admin-tools" aria-label="Store management shortcuts">
-          <a href="/admin/storefront/product/">Products</a>
-          <a href="/admin/storefront/product/add/">Add product</a>
-          <a href="/admin/auth/user/">Customers</a>
-          <a href="/admin/storefront/coupon/">Coupons</a>
+        <nav class="admin-nav" aria-label="Dashboard navigation">
+          <button class="active" type="button" data-view="overview">
+            <span>01</span> Overview
+          </button>
+          <button type="button" data-view="orders">
+            <span>02</span> Orders <em id="navPending">0</em>
+          </button>
+          <button type="button" data-view="products">
+            <span>03</span> Products
+          </button>
+          <button type="button" data-view="customers">
+            <span>04</span> Customers
+          </button>
+          <button type="button" data-view="coupons">
+            <span>05</span> Coupons
+          </button>
         </nav>
-      </section>
 
-      <section class="admin-stats" aria-label="Order status totals">
-        <button class="stat-card active" type="button" data-status="">
-          <span>All</span>
-          <strong id="statAll">0</strong>
-        </button>
-        <button class="stat-card urgent" type="button" data-status="pending">
-          <span>Pending</span>
-          <strong id="statPending">0</strong>
-        </button>
-        <button class="stat-card" type="button" data-status="confirmed">
-          <span>Confirmed</span>
-          <strong id="statConfirmed">0</strong>
-        </button>
-        <button class="stat-card" type="button" data-status="received">
-          <span>Delivered</span>
-          <strong id="statReceived">0</strong>
-        </button>
-        <button class="stat-card" type="button" data-status="cancelled">
-          <span>Cancelled</span>
-          <strong id="statCancelled">0</strong>
-        </button>
-      </section>
+        <div class="admin-sidebar-footer">
+          <a href="/" target="_blank" rel="noreferrer">View storefront</a>
+          <button type="button" data-admin-logout>Sign out</button>
+        </div>
+      </aside>
 
-      <section class="admin-orders" id="adminOrders" aria-live="polite"></section>
-      <p class="form-note" id="dashboardMessage" role="status"></p>
-    </main>
+      <div class="admin-main">
+        <header class="admin-topbar">
+          <button class="admin-menu-button" type="button" data-toggle-sidebar aria-label="Toggle navigation">Menu</button>
+          <div>
+            <p id="viewEyebrow">Store workspace</p>
+            <h1 id="viewTitle">Overview</h1>
+          </div>
+          <div class="admin-user">
+            <span>{{ request.user.get_full_name|default:request.user.username }}</span>
+            <strong>{{ request.user.username|slice:":1"|upper }}</strong>
+          </div>
+        </header>
 
-    <script src="/dashboard.js?v=20260711.3"></script>
+        <main class="admin-content">
+          <section class="admin-view active" data-panel="overview" aria-labelledby="viewTitle">
+            <div class="metric-grid" aria-label="Store totals">
+              <article class="metric-card metric-accent-pink">
+                <span>Order value</span>
+                <strong id="overviewValue">Tk 0</strong>
+                <small>Excludes cancelled</small>
+              </article>
+              <article class="metric-card metric-accent-blue">
+                <span>Total orders</span>
+                <strong id="overviewOrders">0</strong>
+                <small id="overviewToday">0 today</small>
+              </article>
+              <article class="metric-card metric-accent-yellow">
+                <span>Needs review</span>
+                <strong id="overviewPending">0</strong>
+                <small>Pending orders</small>
+              </article>
+              <article class="metric-card metric-accent-violet">
+                <span>Active products</span>
+                <strong id="overviewProducts">0</strong>
+                <small id="overviewCustomers">0 customers</small>
+              </article>
+            </div>
+
+            <section class="dashboard-section">
+              <div class="section-toolbar">
+                <div>
+                  <p class="section-kicker">Latest activity</p>
+                  <h2>Recent orders</h2>
+                </div>
+                <button class="admin-text-button" type="button" data-view="orders">See all orders</button>
+              </div>
+              <div class="data-surface" id="recentOrders"></div>
+            </section>
+          </section>
+
+          <section class="admin-view" data-panel="orders" aria-label="Orders">
+            <div class="section-toolbar">
+              <div>
+                <p class="section-kicker">Fulfilment</p>
+                <h2>Orders</h2>
+              </div>
+              <div class="order-filters" aria-label="Filter orders">
+                <button class="active" type="button" data-status="">All <span id="statAll">0</span></button>
+                <button type="button" data-status="pending">Pending <span id="statPending">0</span></button>
+                <button type="button" data-status="confirmed">Confirmed <span id="statConfirmed">0</span></button>
+                <button type="button" data-status="received">Delivered <span id="statReceived">0</span></button>
+                <button type="button" data-status="cancelled">Cancelled <span id="statCancelled">0</span></button>
+              </div>
+            </div>
+            <div class="admin-orders" id="adminOrders" aria-live="polite"></div>
+          </section>
+
+          <section class="admin-view" data-panel="products" aria-label="Products">
+            <div class="section-toolbar">
+              <div>
+                <p class="section-kicker">Catalog</p>
+                <h2>Products</h2>
+              </div>
+              <div class="toolbar-actions">
+                <label class="admin-search">
+                  <span>Search</span>
+                  <input id="productSearch" type="search" placeholder="Product name">
+                </label>
+                <button class="admin-primary-button" type="button" data-add-product>Add product</button>
+              </div>
+            </div>
+            <div class="data-surface table-scroll">
+              <table class="admin-table">
+                <thead>
+                  <tr><th>Product</th><th>Category</th><th>Price</th><th>Visibility</th><th>Order</th><th></th></tr>
+                </thead>
+                <tbody id="productRows"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="admin-view" data-panel="customers" aria-label="Customers">
+            <div class="section-toolbar">
+              <div>
+                <p class="section-kicker">Accounts</p>
+                <h2>Customers</h2>
+              </div>
+              <label class="admin-search">
+                <span>Search</span>
+                <input id="customerSearch" type="search" placeholder="Name, email, or phone">
+              </label>
+            </div>
+            <div class="data-surface table-scroll">
+              <table class="admin-table">
+                <thead>
+                  <tr><th>Customer</th><th>Phone</th><th>Verification</th><th>Orders</th><th>Order value</th><th>Joined</th></tr>
+                </thead>
+                <tbody id="customerRows"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="admin-view" data-panel="coupons" aria-label="Coupons">
+            <div class="section-toolbar">
+              <div>
+                <p class="section-kicker">Promotions</p>
+                <h2>Coupons</h2>
+              </div>
+              <button class="admin-primary-button" type="button" data-add-coupon>Add coupon</button>
+            </div>
+            <div class="data-surface table-scroll">
+              <table class="admin-table">
+                <thead>
+                  <tr><th>Code</th><th>Discount</th><th>Uses</th><th>Limit</th><th>Status</th><th></th></tr>
+                </thead>
+                <tbody id="couponRows"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <p class="admin-toast" id="dashboardMessage" role="status"></p>
+        </main>
+      </div>
+    </div>
+
+    <dialog class="admin-dialog" id="productDialog">
+      <form id="productForm" enctype="multipart/form-data">
+        <header>
+          <div><p>Catalog item</p><h2 id="productDialogTitle">Add product</h2></div>
+          <button type="button" data-close-dialog="productDialog" aria-label="Close product editor">X</button>
+        </header>
+        <input name="productId" type="hidden">
+        <div class="dialog-grid">
+          <label class="dialog-span-2">Product name<input name="name" type="text" maxlength="120" required></label>
+          <label>Category
+            <select name="category" required>
+              <option value="cards">Cards</option>
+              <option value="accessories">Accessories</option>
+              <option value="stationery">Stationery</option>
+            </select>
+          </label>
+          <label>Price (Tk)<input name="price" type="number" min="1" step="1" required></label>
+          <label class="dialog-span-2">Short tag<input name="tag" type="text" maxlength="80" placeholder="Example: Gift ready"></label>
+          <label>Sort order<input name="sortOrder" type="number" min="0" step="1" value="0"></label>
+          <label class="admin-check"><input name="isActive" type="checkbox" checked> Visible in store</label>
+          <label class="dialog-span-2">Product image<input name="image" type="file" accept="image/png,image/jpeg,image/webp"></label>
+          <label class="dialog-span-2">Existing asset path<input name="staticImagePath" type="text" placeholder="assets/product.png"></label>
+          <label class="admin-check dialog-span-2" id="removeImageLabel" hidden><input name="removeImage" type="checkbox"> Remove uploaded image</label>
+        </div>
+        <p class="dialog-message" id="productFormMessage" role="status"></p>
+        <footer>
+          <button class="admin-danger-button" id="deleteProductButton" type="button" hidden>Delete product</button>
+          <span></span>
+          <button class="admin-secondary-button" type="button" data-close-dialog="productDialog">Cancel</button>
+          <button class="admin-primary-button" type="submit">Save product</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog class="admin-dialog" id="couponDialog">
+      <form id="couponForm">
+        <header>
+          <div><p>Promotion</p><h2 id="couponDialogTitle">Add coupon</h2></div>
+          <button type="button" data-close-dialog="couponDialog" aria-label="Close coupon editor">X</button>
+        </header>
+        <input name="couponId" type="hidden">
+        <div class="dialog-grid">
+          <label class="dialog-span-2">Coupon code<input name="code" type="text" maxlength="32" required></label>
+          <label>Discount type
+            <select name="discountType">
+              <option value="percent">Percentage</option>
+              <option value="fixed">Fixed amount</option>
+            </select>
+          </label>
+          <label>Value<input name="value" type="number" min="1" step="1" required></label>
+          <label class="admin-check"><input name="isActive" type="checkbox" checked> Active</label>
+          <label class="admin-check"><input name="singleUse" type="checkbox" checked> Once per customer</label>
+        </div>
+        <p class="dialog-message" id="couponFormMessage" role="status"></p>
+        <footer>
+          <span></span><span></span>
+          <button class="admin-secondary-button" type="button" data-close-dialog="couponDialog">Cancel</button>
+          <button class="admin-primary-button" type="submit">Save coupon</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <script src="/dashboard.js?v=20260712.1"></script>
   </body>
 </html>

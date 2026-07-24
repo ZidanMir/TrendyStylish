@@ -10,6 +10,7 @@ from storefront import views
 urlpatterns = [
     path("", views.storefront, name="storefront"),
     path("dashboard/", views.dashboard, name="dashboard"),
+    path("admin/", views.admin_entry, name="admin_entry"),
     path("admin/", admin.site.urls),
     path("api/products/", views.products_api, name="products_api"),
     path("api/orders/", views.orders_api, name="orders_api"),
@@ -23,13 +24,22 @@ urlpatterns = [
     path("api/auth/email/verify/", views.email_verification_check_api, name="email_verification_check_api"),
     path("api/dashboard/orders/", views.dashboard_orders_api, name="dashboard_orders_api"),
     path("api/dashboard/orders/<int:order_id>/status/", views.dashboard_order_status_api, name="dashboard_order_status_api"),
+    path("api/dashboard/overview/", views.dashboard_overview_api, name="dashboard_overview_api"),
+    path("api/dashboard/products/", views.dashboard_products_api, name="dashboard_products_api"),
+    path("api/dashboard/products/create/", views.dashboard_product_create_api, name="dashboard_product_create_api"),
+    path("api/dashboard/products/<int:product_id>/update/", views.dashboard_product_update_api, name="dashboard_product_update_api"),
+    path("api/dashboard/products/<int:product_id>/delete/", views.dashboard_product_delete_api, name="dashboard_product_delete_api"),
+    path("api/dashboard/customers/", views.dashboard_customers_api, name="dashboard_customers_api"),
+    path("api/dashboard/coupons/", views.dashboard_coupons_api, name="dashboard_coupons_api"),
+    path("api/dashboard/coupons/create/", views.dashboard_coupon_create_api, name="dashboard_coupon_create_api"),
+    path("api/dashboard/coupons/<int:coupon_id>/update/", views.dashboard_coupon_update_api, name="dashboard_coupon_update_api"),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += [
         re_path(
-            r"^(?P<path>styles\.css|script\.js|dashboard\.js|assets/.+)$",
+            r"^(?P<path>styles\.css|dashboard\.css|script\.js|dashboard\.js|assets/.+)$",
             serve,
             {"document_root": settings.BASE_DIR},
         )

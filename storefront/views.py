@@ -6,11 +6,14 @@ from django.contrib.auth.models import User
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ValidationError
+from django.db.models import Count, Q, Sum
+from django.db.models.deletion import ProtectedError
 from django.core.validators import validate_email
 from django.db import IntegrityError, transaction
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.utils import timezone
+from django.utils.text import slugify
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_POST
 
@@ -38,6 +41,11 @@ def storefront(request):
 @ensure_csrf_cookie
 def dashboard(request):
     return render(request, "dashboard.html")
+
+
+@staff_member_required(login_url="/admin/login/")
+def admin_entry(request):
+    return redirect("dashboard")
 
 
 def product_payload(product):
@@ -268,6 +276,258 @@ def staff_required_json(view_func):
     return wrapper
 
 
+def dashboard_product_payload(product):
+    payload = product_payload(product)
+    payload.update(
+        {
+            "databaseId": product.pk,
+            "isActive": product.is_active,
+            "hasUploadedImage": bool(product.image),
+            "sortOrder": product.sort_order,
+            "staticImagePath": product.static_image_path,
+            "updatedAt": product.updated_at.isoformat(),
+        }
+    )
+    return payload
+
+
+def dashboard_coupon_payload(coupon):
+    redemption_count = getattr(coupon, "redemption_count", None)
+    if redemption_count is None:
+        redemption_count = coupon.redemptions.count()
+
+    return {
+        "id": coupon.pk,
+        "code": coupon.code,
+        "discountType": coupon.discount_type,
+        "discountLabel": coupon.get_discount_type_display(),
+        "value": coupon.value,
+        "isActive": coupon.is_active,
+        "singleUse": coupon.single_use_per_customer,
+        "redemptions": redemption_count,
+    }
+
+
+def unique_product_slug(name, product_id=None):
+    base = slugify(name) or "product"
+    candidate = base
+    suffix = 2
+    existing = Product.objects.exclude(pk=product_id)
+    while existing.filter(slug=candidate).exists():
+        candidate = f"{base}-{suffix}"
+        suffix += 1
+    return candidate
+
+
+def parse_nonnegative_int(value, label, minimum=0):
+    try:
+        number = int(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{label} must be a whole number.") from exc
+    if number < minimum:
+        raise ValueError(f"{label} must be at least {minimum}.")
+    return number
+
+
+@require_GET
+@staff_required_json
+def dashboard_overview_api(request):
+    order_value = Order.objects.exclude(status=Order.STATUS_CANCELLED).aggregate(total=Sum("total"))["total"] or 0
+    stats = {
+        "orders": Order.objects.count(),
+        "pending": Order.objects.filter(status=Order.STATUS_PENDING).count(),
+        "products": Product.objects.filter(is_active=True).count(),
+        "customers": User.objects.filter(is_staff=False).count(),
+        "orderValue": order_value,
+        "today": Order.objects.filter(created_at__date=timezone.localdate()).count(),
+    }
+    recent_orders = Order.objects.select_related("coupon").prefetch_related("items")[:5]
+    return JsonResponse({"stats": stats, "recentOrders": [order_payload(order) for order in recent_orders]})
+
+
+@require_GET
+@staff_required_json
+def dashboard_products_api(request):
+    products = Product.objects.all()
+    return JsonResponse({"products": [dashboard_product_payload(product) for product in products]})
+
+
+@require_POST
+@staff_required_json
+def dashboard_product_create_api(request):
+    name = (request.POST.get("name") or "").strip()
+    category = request.POST.get("category")
+    if not name:
+        return JsonResponse({"error": "Product name is required."}, status=400)
+    if category not in {choice[0] for choice in Product.CATEGORY_CHOICES}:
+        return JsonResponse({"error": "Choose a valid product category."}, status=400)
+    try:
+        price = parse_nonnegative_int(request.POST.get("price"), "Price", minimum=1)
+        sort_order = parse_nonnegative_int(request.POST.get("sortOrder") or 0, "Sort order")
+    except ValueError as exc:
+        return JsonResponse({"error": str(exc)}, status=400)
+
+    product = Product.objects.create(
+        slug=unique_product_slug(name),
+        name=name,
+        category=category,
+        price=price,
+        tag=(request.POST.get("tag") or "").strip(),
+        image=request.FILES.get("image"),
+        static_image_path=(request.POST.get("staticImagePath") or "").strip(),
+        is_active=request.POST.get("isActive") == "true",
+        sort_order=sort_order,
+    )
+    return JsonResponse({"product": dashboard_product_payload(product)}, status=201)
+
+
+@require_POST
+@staff_required_json
+def dashboard_product_update_api(request, product_id):
+    try:
+        product = Product.objects.get(pk=product_id)
+    except Product.DoesNotExist:
+        return JsonResponse({"error": "Product not found."}, status=404)
+
+    name = (request.POST.get("name") or "").strip()
+    category = request.POST.get("category")
+    if not name:
+        return JsonResponse({"error": "Product name is required."}, status=400)
+    if category not in {choice[0] for choice in Product.CATEGORY_CHOICES}:
+        return JsonResponse({"error": "Choose a valid product category."}, status=400)
+    try:
+        price = parse_nonnegative_int(request.POST.get("price"), "Price", minimum=1)
+        sort_order = parse_nonnegative_int(request.POST.get("sortOrder") or 0, "Sort order")
+    except ValueError as exc:
+        return JsonResponse({"error": str(exc)}, status=400)
+
+    product.name = name
+    product.slug = unique_product_slug(name, product.pk)
+    product.category = category
+    product.price = price
+    product.tag = (request.POST.get("tag") or "").strip()
+    product.static_image_path = (request.POST.get("staticImagePath") or "").strip()
+    product.is_active = request.POST.get("isActive") == "true"
+    product.sort_order = sort_order
+    if request.FILES.get("image"):
+        product.image = request.FILES["image"]
+    if request.POST.get("removeImage") == "true":
+        product.image = None
+    product.save()
+    return JsonResponse({"product": dashboard_product_payload(product)})
+
+
+@require_POST
+@staff_required_json
+def dashboard_product_delete_api(request, product_id):
+    try:
+        product = Product.objects.get(pk=product_id)
+    except Product.DoesNotExist:
+        return JsonResponse({"error": "Product not found."}, status=404)
+    try:
+        product.delete()
+    except ProtectedError:
+        return JsonResponse(
+            {"error": "This product belongs to an order. Hide it from the store instead."},
+            status=400,
+        )
+    return JsonResponse({"deleted": True})
+
+
+@require_GET
+@staff_required_json
+def dashboard_customers_api(request):
+    customers = (
+        User.objects.filter(is_staff=False)
+        .select_related("customer_profile")
+        .annotate(
+            order_count=Count("orders"),
+            order_total=Sum("orders__total", filter=~Q(orders__status=Order.STATUS_CANCELLED)),
+        )
+        .order_by("-date_joined")[:100]
+    )
+    result = []
+    for customer in customers:
+        profile = getattr(customer, "customer_profile", None)
+        result.append(
+            {
+                "id": customer.pk,
+                "name": customer.get_full_name() or customer.username,
+                "email": customer.email,
+                "phone": profile.phone if profile else "",
+                "phoneVerified": bool(profile and profile.phone_verified_at),
+                "emailVerified": bool(profile and profile.email_verified_at),
+                "orders": customer.order_count,
+                "orderTotal": customer.order_total or 0,
+                "joinedAt": customer.date_joined.isoformat(),
+            }
+        )
+    return JsonResponse({"customers": result})
+
+
+@require_GET
+@staff_required_json
+def dashboard_coupons_api(request):
+    coupons = Coupon.objects.annotate(redemption_count=Count("redemptions"))
+    return JsonResponse({"coupons": [dashboard_coupon_payload(coupon) for coupon in coupons]})
+
+
+def coupon_from_payload(coupon, payload):
+    code = (payload.get("code") or "").strip().upper()
+    discount_type = payload.get("discountType")
+    if not code:
+        raise ValueError("Coupon code is required.")
+    if discount_type not in {choice[0] for choice in Coupon.DISCOUNT_CHOICES}:
+        raise ValueError("Choose a valid discount type.")
+    value = parse_nonnegative_int(payload.get("value"), "Discount", minimum=1)
+    if discount_type == Coupon.DISCOUNT_PERCENT and value > 100:
+        raise ValueError("Percentage discount cannot exceed 100.")
+    duplicate = Coupon.objects.filter(code__iexact=code)
+    if coupon:
+        duplicate = duplicate.exclude(pk=coupon.pk)
+    if duplicate.exists():
+        raise ValueError("A coupon with this code already exists.")
+
+    coupon = coupon or Coupon()
+    coupon.code = code
+    coupon.discount_type = discount_type
+    coupon.value = value
+    coupon.is_active = bool(payload.get("isActive"))
+    coupon.single_use_per_customer = bool(payload.get("singleUse"))
+    coupon.save()
+    return coupon
+
+
+@require_POST
+@staff_required_json
+def dashboard_coupon_create_api(request):
+    try:
+        payload = json.loads(request.body or "{}")
+        coupon = coupon_from_payload(None, payload)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON body."}, status=400)
+    except ValueError as exc:
+        return JsonResponse({"error": str(exc)}, status=400)
+    coupon.redemption_count = 0
+    return JsonResponse({"coupon": dashboard_coupon_payload(coupon)}, status=201)
+
+
+@require_POST
+@staff_required_json
+def dashboard_coupon_update_api(request, coupon_id):
+    try:
+        coupon = Coupon.objects.annotate(redemption_count=Count("redemptions")).get(pk=coupon_id)
+        payload = json.loads(request.body or "{}")
+        coupon = coupon_from_payload(coupon, payload)
+    except Coupon.DoesNotExist:
+        return JsonResponse({"error": "Coupon not found."}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON body."}, status=400)
+    except ValueError as exc:
+        return JsonResponse({"error": str(exc)}, status=400)
+    return JsonResponse({"coupon": dashboard_coupon_payload(coupon)})
+
+
 @require_GET
 @staff_required_json
 def dashboard_orders_api(request):
@@ -329,10 +589,25 @@ def orders_api(request):
     if not isinstance(items, list) or not items:
         return JsonResponse({"error": "Add at least one product before checkout."}, status=400)
 
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {"error": "Sign in before placing an order so updates can be sent to your registered email."},
+            status=401,
+        )
+
+    profile, _created = CustomerProfile.objects.get_or_create(user=request.user)
     customer_name = (payload.get("name") or "").strip()
-    email = (payload.get("email") or (request.user.email if request.user.is_authenticated else "")).strip().lower()
+    email = request.user.email.strip().lower()
+    phone_mode = payload.get("deliveryPhoneMode") or "custom"
+    phone_value = payload.get("deliveryPhone") or payload.get("phone")
+    if phone_mode == "registered":
+        phone_value = profile.phone
+        if not phone_value:
+            return JsonResponse({"error": "Add a delivery number or choose another delivery number."}, status=400)
+    elif phone_mode != "custom":
+        return JsonResponse({"error": "Choose a delivery phone number."}, status=400)
     try:
-        phone = normalize_bangladesh_phone(payload.get("phone"))
+        phone = normalize_bangladesh_phone(phone_value)
     except VerificationError as exc:
         return JsonResponse({"error": str(exc)}, status=400)
     address = (payload.get("address") or "").strip()
@@ -341,15 +616,9 @@ def orders_api(request):
     try:
         validate_email(email)
     except ValidationError:
-        return JsonResponse({"error": "Enter a valid email for order updates."}, status=400)
+        return JsonResponse({"error": "Your account needs a valid email address for order updates."}, status=400)
     if not address:
         return JsonResponse({"error": "Enter the delivery address."}, status=400)
-
-    profile = None
-    if request.user.is_authenticated:
-        profile, _created = CustomerProfile.objects.get_or_create(user=request.user)
-        if profile.phone_verified_at and profile.phone != phone:
-            return JsonResponse({"error": "Use the verified phone number saved on your account."}, status=400)
 
     product_ids = [item.get("id") for item in items if isinstance(item, dict)]
     if len(product_ids) != len(items) or len(set(product_ids)) != len(product_ids):
@@ -427,9 +696,8 @@ def orders_api(request):
             )
 
             if profile:
-                profile.phone = order.phone
                 profile.address = order.address
-                profile.save(update_fields=["phone", "address"])
+                profile.save(update_fields=["address"])
 
             if coupon and request.user.is_authenticated:
                 CouponRedemption.objects.create(coupon=coupon, user=request.user, order=order, discount=discount)
@@ -448,7 +716,7 @@ def orders_api(request):
             "coupon": order.coupon.code if order.coupon else "",
             "status": order.status,
             "statusLabel": order.get_status_display(),
-            "message": "Order placed. Confirmation and tracking updates will be emailed.",
+            "message": "Order placed. Confirmation and tracking updates will be sent to your registered email.",
         },
         status=201,
     )
